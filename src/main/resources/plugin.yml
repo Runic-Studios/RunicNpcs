@@ -1,0 +1,9 @@
+name: RunicNpcs
+description: Runic Realms NPCs Plugin, by Excel
+version: 1.0
+main: com.runicrealms.runicnpcs.Plugin
+api-version: 1.13
+depend: [HolographicDisplays]
+commands:
+  runicnpc:
+    description: Command for runic npcs
