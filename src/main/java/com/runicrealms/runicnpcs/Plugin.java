@@ -7,8 +7,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
 
 public class Plugin extends JavaPlugin {
 
@@ -29,8 +32,7 @@ public class Plugin extends JavaPlugin {
         }
         config = ConfigUtil.getYamlConfigFile("npcs.yml", this.getDataFolder());
         nextId = ConfigUtil.loadNextId(config);
-        npcs = ConfigUtil.loadNpcs(config);
-        npcEntityIds = ConfigUtil.sortNpcsByEntityId(npcs);
+        ConfigUtil.loadNpcs(config);
     }
 
     @Override
@@ -64,8 +66,31 @@ public class Plugin extends JavaPlugin {
         return current;
     }
 
+    public static void setNpcs(Map<Integer, Npc> npcs) {
+        Plugin.npcs = npcs;
+    }
+
+    public static void setNpcEntityIds(Map<Integer, Npc> npcs) {
+        Plugin.npcEntityIds = npcs;
+    }
+
     public static FileConfiguration getFileConfig() {
         return config;
+    }
+
+    public static boolean uuidInUse(String uuid) {
+        String url = "https://api.mojang.com/user/profiles/" + uuid.replace("-", "") + "/names";
+        try {
+            Scanner scanner = new Scanner(new URL(url).openStream(), "UTF-8").useDelimiter("\\A");
+            if (scanner.hasNext()) {
+                scanner.close();
+                return true;
+            }
+            scanner.close();
+        } catch (IOException exception) {
+            exception.printStackTrace();
+        }
+        return false;
     }
 
 }

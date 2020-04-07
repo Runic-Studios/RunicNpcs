@@ -17,6 +17,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.util.logging.Level;
 
 public class ConfigUtil {
 
@@ -36,35 +38,47 @@ public class ConfigUtil {
         return config;
     }
 
-    public static Map<Integer, Npc> loadNpcs(FileConfiguration config) {
-        Map<Integer, Npc> npcs = new HashMap<Integer, Npc>();
-        if (config.contains("npcs")) {
-            ConfigurationSection npcsSection = config.getConfigurationSection("npcs");
-            for (String key : npcsSection.getKeys(false)) {
-                Hologram hologram = HologramsAPI.createHologram(Plugin.getInstance(), new Location(
-                        Bukkit.getWorld(npcsSection.getString(key + ".hologram.world")),
-                        Double.parseDouble(npcsSection.getString(key + ".hologram.x")),
-                        Double.parseDouble(npcsSection.getString(key + ".hologram.y")),
-                        Double.parseDouble(npcsSection.getString(key + ".hologram.z"))));
-                hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + npcsSection.getString(key + ".hologram.name")));
-                hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&7" + npcsSection.getString(key + ".hologram.label")));
-                npcs.put(Integer.parseInt(key), new Npc(
-                        new Location(
-                                Bukkit.getWorld(npcsSection.getString(key + ".location.world")),
-                                Double.parseDouble(npcsSection.getString(key + ".location.x")),
-                                Double.parseDouble(npcsSection.getString(key + ".location.y")),
-                                Double.parseDouble(npcsSection.getString(key + ".location.z")),
-                                Float.parseFloat(npcsSection.getString(key + ".location.yaw")),
-                                Float.parseFloat(npcsSection.getString(key + ".location.pitch"))),
-                        new Skin(npcsSection.getString(key + ".skin-texture"), npcsSection.getString(key + ".skin-signature")),
-                        Integer.parseInt(key),
-                        hologram));
+    public static void loadNpcs(FileConfiguration config) {
+        Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                Map<Integer, Npc> npcs = new HashMap<Integer, Npc>();
+                if (config.contains("npcs")) {
+                    ConfigurationSection npcsSection = config.getConfigurationSection("npcs");
+                    for (String key : npcsSection.getKeys(false)) {
+                        Hologram hologram = HologramsAPI.createHologram(Plugin.getInstance(), new Location(
+                                Bukkit.getWorld(npcsSection.getString(key + ".hologram.world")),
+                                Double.parseDouble(npcsSection.getString(key + ".hologram.x")),
+                                Double.parseDouble(npcsSection.getString(key + ".hologram.y")),
+                                Double.parseDouble(npcsSection.getString(key + ".hologram.z"))));
+                        hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + npcsSection.getString(key + ".hologram.name")));
+                        hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&7" + npcsSection.getString(key + ".hologram.label")));
+                        String uuid = npcsSection.getString(key + ".uuid");
+                        while (Plugin.uuidInUse(uuid)) {
+                            uuid = UUID.randomUUID().toString();
+                        }
+                        npcs.put(Integer.parseInt(key), new Npc(
+                                    new Location(
+                                            Bukkit.getWorld(npcsSection.getString(key + ".location.world")),
+                                            Double.parseDouble(npcsSection.getString(key + ".location.x")),
+                                            Double.parseDouble(npcsSection.getString(key + ".location.y")),
+                                            Double.parseDouble(npcsSection.getString(key + ".location.z")),
+                                            Float.parseFloat(npcsSection.getString(key + ".location.yaw")),
+                                            Float.parseFloat(npcsSection.getString(key + ".location.pitch"))),
+                                    new Skin(npcsSection.getString(key + ".skin-texture"), npcsSection.getString(key + ".skin-signature")),
+                                    Integer.parseInt(key),
+                                    hologram,
+                                    uuid));
+                    }
+                }
+                Plugin.setNpcs(npcs);
+                Plugin.setNpcEntityIds(sortNpcsByEntityId(npcs));
+                Bukkit.getLogger().log(Level.INFO, "[RunicNpcs] NPCs have been loaded!");
             }
-        }
-        return npcs;
+        });
     }
 
-    public static Map<Integer, Npc> sortNpcsByEntityId(Map<Integer, Npc> npcs) {
+    private static Map<Integer, Npc> sortNpcsByEntityId(Map<Integer, Npc> npcs) {
         Map<Integer, Npc> npcEntityIds = new HashMap<Integer, Npc>();
         for (Map.Entry<Integer, Npc> entry : npcs.entrySet()) {
             npcEntityIds.put(entry.getValue().getEntityId(), entry.getValue());
@@ -90,6 +104,7 @@ public class ConfigUtil {
                 config.set("npcs." + npc.getId() + ".location.pitch", npc.getLocation().getPitch());
                 config.set("npcs." + npc.getId() + ".skin-texture", npc.getSkin().getTexture());
                 config.set("npcs." + npc.getId() + ".skin-signature", npc.getSkin().getSignature());
+                config.set("npcs." + npc.getId() + ".uuid", npc.getUuid());
                 try {
                     config.save(new File(Plugin.getInstance().getDataFolder(), "npcs.yml"));
                 } catch (IOException e) {

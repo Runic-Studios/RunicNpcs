@@ -24,11 +24,12 @@ public class Npc {
     private int id;
     private Hologram hologram;
     private Skin skin;
+    private String uuid;
 
-    public Npc(Location location, Skin skin, Integer id, Hologram hologram) {
+    public Npc(Location location, Skin skin, Integer id, Hologram hologram, String uuid) {
         this.id = id;
         this.skin = skin;
-        gameProfile = new GameProfile(UUID.fromString("00000000-0000-0000-0000-000000000000"), "npc");
+        gameProfile = new GameProfile(UUID.fromString(uuid), "npc");
         PropertyMap properties = gameProfile.getProperties();
         if (properties.get("textures").iterator().hasNext()) {
             properties.remove("textures", properties.get("textures").iterator().next());
@@ -77,6 +78,10 @@ public class Npc {
 
     public Skin getSkin() {
         return this.skin;
+    }
+
+    public String getUuid() {
+        return this.uuid;
     }
 
 }

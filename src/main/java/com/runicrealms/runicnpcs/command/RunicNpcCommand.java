@@ -37,6 +37,11 @@ public class RunicNpcCommand implements CommandExecutor {
                             public void run() {
                                 Skin skin = getMineskinSkin(args[3]);
                                 if (skin != null) {
+                                    String uuid = UUID.randomUUID().toString();
+                                    while (Plugin.uuidInUse(uuid)) {
+                                        uuid = UUID.randomUUID().toString();
+                                    }
+                                    final String finalUuid = new String(uuid);
                                     Bukkit.getScheduler().runTask(Plugin.getInstance(), new Runnable() {
                                         @Override
                                         public void run() {
@@ -45,7 +50,7 @@ public class RunicNpcCommand implements CommandExecutor {
                                             hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + args[1].replaceAll("_", " ")));
                                             hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&7" + args[2].replaceAll("_", " ")));
                                             Integer id = new Integer(Plugin.getNextId());
-                                            Npc npc = new Npc(npcLocation, skin, id, hologram);
+                                            Npc npc = new Npc(npcLocation, skin, id, hologram, finalUuid);
                                             ConfigUtil.saveNpc(npc, Plugin.getFileConfig());
                                             Plugin.getNpcs().put(npc.getId(), npc);
                                             Plugin.getNpcEntityIds().put(npc.getEntityId(), npc);
