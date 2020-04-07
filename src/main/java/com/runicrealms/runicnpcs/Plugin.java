@@ -33,6 +33,13 @@ public class Plugin extends JavaPlugin {
         npcEntityIds = ConfigUtil.sortNpcsByEntityId(npcs);
     }
 
+    @Override
+    public void onDisable() {
+        for (Map.Entry<Integer, Npc> npc : npcs.entrySet()) {
+            npc.getValue().delete();
+        }
+    }
+
     public static Map<Integer, Npc> getNpcs() {
         return npcs;
     }
