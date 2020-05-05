@@ -7,11 +7,7 @@ import net.minecraft.server.v1_15_R1.EntityPlayer;
 public class RunicNpcsAPI {
 
     public static boolean isNpc(EntityPlayer player) {
-        return Plugin.getNpcEntityIds().containsKey(player.getId());
-    }
-
-    public static Npc getNpcFromEntityId(Integer entityId) {
-        return Plugin.getNpcEntityIds().get(entityId);
+        return Plugin.getNpcEntities().containsKey(player);
     }
 
     public static Npc getNpcById(Integer id) {

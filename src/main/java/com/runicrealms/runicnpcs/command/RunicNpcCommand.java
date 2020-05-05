@@ -53,7 +53,7 @@ public class RunicNpcCommand implements CommandExecutor {
                                             Npc npc = new Npc(npcLocation, skin, id, hologram, finalUuid);
                                             ConfigUtil.saveNpc(npc, Plugin.getFileConfig());
                                             Plugin.getNpcs().put(npc.getId(), npc);
-                                            Plugin.getNpcEntityIds().put(npc.getEntityId(), npc);
+                                            Plugin.getNpcEntities().put(npc.getEntityPlayer(), npc);
                                             for (Player otherPlayer : Bukkit.getOnlinePlayers()) {
                                                 npc.spawnForPlayer(otherPlayer);
                                             }
@@ -73,11 +73,10 @@ public class RunicNpcCommand implements CommandExecutor {
                         if (isInt(args[1])) {
                             if (Plugin.getNpcs().containsKey(Integer.parseInt(args[1]))) {
                                 Npc npc = Plugin.getNpcs().get(Integer.parseInt(args[1]));
-                                Integer entityId = new Integer(npc.getEntityId());
-                                npc.delete();
                                 Plugin.getNpcs().remove(Integer.parseInt(args[1]));
+                                Plugin.getNpcEntities().remove(npc.getEntityPlayer());
+                                npc.delete();
                                 ConfigUtil.deleteNpc(Integer.parseInt(args[1]), Plugin.getFileConfig());
-                                Plugin.getNpcEntityIds().remove(entityId);
                                 sendMessage(player, "&aSuccessfully removed NPC!");
                             } else {
                                 sendMessage(player, "&cThere is no NPC with that ID!");

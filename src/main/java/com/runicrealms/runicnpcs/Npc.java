@@ -29,6 +29,7 @@ public class Npc {
     public Npc(Location location, Skin skin, Integer id, Hologram hologram, String uuid) {
         this.id = id;
         this.skin = skin;
+        this.uuid = uuid;
         gameProfile = new GameProfile(UUID.fromString(uuid), "npc");
         PropertyMap properties = gameProfile.getProperties();
         if (properties.get("textures").iterator().hasNext()) {
@@ -53,6 +54,10 @@ public class Npc {
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, this.entityPlayer));
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutNamedEntitySpawn(this.entityPlayer));
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityMetadata(this.entityPlayer.getId(), this.watcher, true));
+    }
+
+    public void despawnForPlayer(Player player) {
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityDestroy(this.entityPlayer.getId()));
     }
 
     public void delete() {
@@ -82,6 +87,10 @@ public class Npc {
 
     public String getUuid() {
         return this.uuid;
+    }
+
+    public EntityPlayer getEntityPlayer() {
+        return this.entityPlayer;
     }
 
 }

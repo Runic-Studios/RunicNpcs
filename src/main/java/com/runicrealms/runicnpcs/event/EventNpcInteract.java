@@ -20,7 +20,7 @@ public class EventNpcInteract implements Listener {
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
         if (event.getEntity().getType() == EntityType.PLAYER) {
-            if (Plugin.getNpcEntityIds().containsKey(((CraftPlayer) event.getEntity()).getHandle().getId())) {
+            if (Plugin.getNpcEntities().containsKey(((CraftPlayer) event.getEntity()).getHandle())) {
                 event.setCancelled(true);
             }
         }
@@ -30,8 +30,8 @@ public class EventNpcInteract implements Listener {
     public void onClick(PlayerInteractEntityEvent event) {
         if (event.getHand().equals(EquipmentSlot.HAND)) {
             if (event.getRightClicked().getType() == EntityType.PLAYER) {
-                if (Plugin.getNpcEntityIds().containsKey(((CraftPlayer) event.getRightClicked()).getHandle().getId())) {
-                    Bukkit.getServer().getPluginManager().callEvent(new NpcClickEvent(Plugin.getNpcEntityIds().get(((CraftPlayer) event.getRightClicked()).getHandle().getId()), event.getPlayer()));
+                if (Plugin.getNpcEntities().containsKey(((CraftPlayer) event.getRightClicked()).getHandle().getId())) {
+                    Bukkit.getServer().getPluginManager().callEvent(new NpcClickEvent(Plugin.getNpcEntities().get(((CraftPlayer) event.getRightClicked()).getHandle().getId()), event.getPlayer()));
                 }
             }
         }

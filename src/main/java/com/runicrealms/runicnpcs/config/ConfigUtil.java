@@ -6,6 +6,7 @@ import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.runicrealms.runicnpcs.Npc;
 import com.runicrealms.runicnpcs.Plugin;
 import com.runicrealms.runicnpcs.Skin;
+import net.minecraft.server.v1_15_R1.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -72,16 +73,16 @@ public class ConfigUtil {
                     }
                 }
                 Plugin.setNpcs(npcs);
-                Plugin.setNpcEntityIds(sortNpcsByEntityId(npcs));
+                Plugin.setNpcEntityIds(sortNpcsByEntity(npcs));
                 Bukkit.getLogger().log(Level.INFO, "[RunicNpcs] NPCs have been loaded!");
             }
         });
     }
 
-    private static Map<Integer, Npc> sortNpcsByEntityId(Map<Integer, Npc> npcs) {
-        Map<Integer, Npc> npcEntityIds = new HashMap<Integer, Npc>();
+    private static Map<EntityPlayer, Npc> sortNpcsByEntity(Map<Integer, Npc> npcs) {
+        Map<EntityPlayer, Npc> npcEntityIds = new HashMap<EntityPlayer, Npc>();
         for (Map.Entry<Integer, Npc> entry : npcs.entrySet()) {
-            npcEntityIds.put(entry.getValue().getEntityId(), entry.getValue());
+            npcEntityIds.put(entry.getValue().getEntityPlayer(), entry.getValue());
         }
         return npcEntityIds;
     }

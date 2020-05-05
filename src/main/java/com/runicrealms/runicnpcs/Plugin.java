@@ -3,8 +3,10 @@ package com.runicrealms.runicnpcs;
 import com.runicrealms.runicnpcs.command.RunicNpcCommand;
 import com.runicrealms.runicnpcs.config.ConfigUtil;
 import com.runicrealms.runicnpcs.event.EventNpcInteract;
+import net.minecraft.server.v1_15_R1.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
@@ -18,7 +20,7 @@ public class Plugin extends JavaPlugin {
     private static Plugin instance;
 
     private static Map<Integer, Npc> npcs = new HashMap<Integer, Npc>();
-    private static Map<Integer, Npc> npcEntityIds = new HashMap<Integer, Npc>();
+    private static Map<EntityPlayer, Npc> npcEntities = new HashMap<EntityPlayer, Npc>();
     private static FileConfiguration config;
     private static Integer nextId;
 
@@ -33,6 +35,16 @@ public class Plugin extends JavaPlugin {
         config = ConfigUtil.getYamlConfigFile("npcs.yml", this.getDataFolder());
         nextId = ConfigUtil.loadNextId(config);
         ConfigUtil.loadNpcs(config);
+        Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    if (NpcHandler.hasLoadedDataForPlayer(player)) {
+                        NpcHandler.updateNpcsForPlayer(player);
+                    }
+                }
+            }
+        }, 7 * 20, 7 * 20);
     }
 
     @Override
@@ -46,8 +58,8 @@ public class Plugin extends JavaPlugin {
         return npcs;
     }
 
-    public static Map<Integer, Npc> getNpcEntityIds() {
-        return npcEntityIds;
+    public static Map<EntityPlayer, Npc> getNpcEntities() {
+        return npcEntities;
     }
 
     public static Plugin getInstance() {
@@ -70,8 +82,8 @@ public class Plugin extends JavaPlugin {
         Plugin.npcs = npcs;
     }
 
-    public static void setNpcEntityIds(Map<Integer, Npc> npcs) {
-        Plugin.npcEntityIds = npcs;
+    public static void setNpcEntityIds(Map<EntityPlayer, Npc> npcs) {
+        Plugin.npcEntities = npcs;
     }
 
     public static FileConfiguration getFileConfig() {
