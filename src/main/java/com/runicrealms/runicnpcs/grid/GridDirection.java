@@ -1,4 +1,4 @@
-package com.runicrealms.runicnpcs.location;
+package com.runicrealms.runicnpcs.grid;
 
 public enum GridDirection {
 

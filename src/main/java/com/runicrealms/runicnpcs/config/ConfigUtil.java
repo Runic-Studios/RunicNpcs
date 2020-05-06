@@ -4,6 +4,7 @@ import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.runicrealms.runicnpcs.Npc;
+import com.runicrealms.runicnpcs.NpcHandler;
 import com.runicrealms.runicnpcs.Plugin;
 import com.runicrealms.runicnpcs.Skin;
 import net.minecraft.server.v1_15_R1.EntityPlayer;
@@ -59,21 +60,22 @@ public class ConfigUtil {
                             uuid = UUID.randomUUID().toString();
                         }
                         npcs.put(Integer.parseInt(key), new Npc(
-                                    new Location(
-                                            Bukkit.getWorld(npcsSection.getString(key + ".location.world")),
-                                            Double.parseDouble(npcsSection.getString(key + ".location.x")),
-                                            Double.parseDouble(npcsSection.getString(key + ".location.y")),
-                                            Double.parseDouble(npcsSection.getString(key + ".location.z")),
-                                            Float.parseFloat(npcsSection.getString(key + ".location.yaw")),
-                                            Float.parseFloat(npcsSection.getString(key + ".location.pitch"))),
-                                    new Skin(npcsSection.getString(key + ".skin-texture"), npcsSection.getString(key + ".skin-signature")),
-                                    Integer.parseInt(key),
-                                    hologram,
-                                    uuid));
+                                new Location(
+                                        Bukkit.getWorld(npcsSection.getString(key + ".location.world")),
+                                        Double.parseDouble(npcsSection.getString(key + ".location.x")),
+                                        Double.parseDouble(npcsSection.getString(key + ".location.y")),
+                                        Double.parseDouble(npcsSection.getString(key + ".location.z")),
+                                        Float.parseFloat(npcsSection.getString(key + ".location.yaw")),
+                                        Float.parseFloat(npcsSection.getString(key + ".location.pitch"))),
+                                new Skin(npcsSection.getString(key + ".skin-texture"), npcsSection.getString(key + ".skin-signature")),
+                                Integer.parseInt(key),
+                                hologram,
+                                uuid));
                     }
                 }
                 Plugin.setNpcs(npcs);
                 Plugin.setNpcEntityIds(sortNpcsByEntity(npcs));
+                NpcHandler.placeNpcsInGrid(npcs);
                 Bukkit.getLogger().log(Level.INFO, "[RunicNpcs] NPCs have been loaded!");
             }
         });

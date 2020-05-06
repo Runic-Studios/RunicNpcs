@@ -28,6 +28,7 @@ public class Plugin extends JavaPlugin {
     public void onEnable() {
         instance = this;
         Bukkit.getPluginManager().registerEvents(new EventNpcInteract(), this);
+        Bukkit.getPluginManager().registerEvents(new NpcHandler(), this);
         Bukkit.getPluginCommand("runicnpc").setExecutor(new RunicNpcCommand());
         if (!this.getDataFolder().exists()) {
             this.getDataFolder().mkdir();
@@ -52,6 +53,17 @@ public class Plugin extends JavaPlugin {
         for (Map.Entry<Integer, Npc> npc : npcs.entrySet()) {
             npc.getValue().delete();
         }
+    }
+
+    public static void updateNpcs() {
+        Bukkit.getScheduler().runTaskAsynchronously(instance, new Runnable() {
+            @Override
+            public void run() {
+                for (Player player : Bukkit.getOnlinePlayers()) {
+                    NpcHandler.updateNpcsForPlayer(player);
+                }
+            }
+        });
     }
 
     public static Map<Integer, Npc> getNpcs() {

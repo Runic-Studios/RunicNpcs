@@ -1,11 +1,11 @@
-package com.runicrealms.runicnpcs.location;
+package com.runicrealms.runicnpcs.grid;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class Grid<E> {
+public abstract class Grid<E> {
 
     private GridBounds bounds;
     private Map<Integer, Set<E>> grid = new HashMap<Integer, Set<E>>();
@@ -14,7 +14,7 @@ public class Grid<E> {
         this.bounds = bounds;
     }
 
-    public void insert(GridLocation location, E element) {
+    protected void insert(GridLocation location, E element) {
         int encoded = location.encodeToInt();
         if (!this.grid.containsKey(encoded)) {
             this.grid.put(encoded, new HashSet<E>());
@@ -22,7 +22,7 @@ public class Grid<E> {
         this.grid.get(encoded).add(element);
     }
 
-    public Set<E> getSurroundingElements(GridLocation location) {
+    protected Set<E> getSurroundingElements(GridLocation location) {
         Set<E> surrounding = new HashSet<E>();
         int encoded = location.encodeToInt();
         if (this.grid.containsKey(encoded)) {
@@ -34,6 +34,21 @@ public class Grid<E> {
             }
         }
         return surrounding;
+    }
+
+    public boolean containsElementInGrid(GridLocation location, E element) {
+        int encoded = location.encodeToInt();
+        if (!this.grid.containsKey(encoded)) {
+            return false;
+        }
+        if (this.grid.get(encoded).contains(element)) {
+            return true;
+        }
+        return false;
+    }
+
+    public void removeElementInGrid(GridLocation location, E element) {
+        this.grid.get(location.encodeToInt()).remove(element);
     }
 
     public GridBounds getBounds() {

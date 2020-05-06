@@ -1,4 +1,4 @@
-package com.runicrealms.runicnpcs.location;
+package com.runicrealms.runicnpcs.grid;
 
 public class GridBounds {
 
@@ -28,6 +28,13 @@ public class GridBounds {
 
     public int getY2() {
         return this.y2;
+    }
+
+    public boolean isInBounds(int x, int y) {
+        return x >= this.getX1() &&
+                x <= this.getX2() &&
+                y >= this.getY1() &&
+                y <= this.getY2();
     }
 
 }

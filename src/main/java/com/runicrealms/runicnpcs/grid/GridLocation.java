@@ -1,4 +1,4 @@
-package com.runicrealms.runicnpcs.location;
+package com.runicrealms.runicnpcs.grid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,10 +38,7 @@ public class GridLocation {
     public List<Integer> getSurrounding() {
         List<Integer> surrounding = new ArrayList<Integer>(GridDirection.values().length);
         for (GridDirection direction : GridDirection.values()) {
-            if (this.x + direction.getX() >= this.grid.getBounds().getX1() &&
-                    this.x + direction.getX() <= this.grid.getBounds().getX2() &&
-                    this.y + direction.getY() >= this.grid.getBounds().getY1() &&
-                    this.y + direction.getY() <= this.grid.getBounds().getY2()) {
+            if (this.grid.getBounds().isInBounds(this.x + direction.getX(), this.y + direction.getY())) {
                 surrounding.add(new GridLocation(this.grid, (short) (this.x + direction.getX()), (short) (this.y + direction.getY())).encodeToInt());
             }
         }
