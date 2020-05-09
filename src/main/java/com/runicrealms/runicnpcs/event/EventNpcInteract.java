@@ -1,6 +1,5 @@
 package com.runicrealms.runicnpcs.event;
 
-import com.runicrealms.runicnpcs.Npc;
 import com.runicrealms.runicnpcs.Plugin;
 import com.runicrealms.runicnpcs.api.NpcClickEvent;
 import org.bukkit.Bukkit;

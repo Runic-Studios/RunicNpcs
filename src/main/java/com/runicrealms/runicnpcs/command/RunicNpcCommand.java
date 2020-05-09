@@ -3,10 +3,7 @@ package com.runicrealms.runicnpcs.command;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
-import com.runicrealms.runicnpcs.Npc;
-import com.runicrealms.runicnpcs.NpcHandler;
-import com.runicrealms.runicnpcs.Plugin;
-import com.runicrealms.runicnpcs.Skin;
+import com.runicrealms.runicnpcs.*;
 import com.runicrealms.runicnpcs.config.ConfigUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -56,9 +53,11 @@ public class RunicNpcCommand implements CommandExecutor {
                                                 ConfigUtil.saveNpc(npc, Plugin.getFileConfig());
                                                 Plugin.getNpcs().put(npc.getId(), npc);
                                                 Plugin.getNpcEntities().put(npc.getEntityPlayer(), npc);
+                                                NpcHandler.createNpcForPlayers(npc);
                                                 NpcHandler.placeNpcInGrid(npc);
+                                                ScoreboardHandler.addNpcName(npc);
                                                 Plugin.updateNpcs();
-                                                sendMessage(player, "&aCreated NPC. ID is " + id + ".");
+                                                sendMessage(player, "&aCreated NPC. ID is " + id + ", relog to see the text above the NPC.");
                                             }
                                         });
                                     } else {
@@ -76,7 +75,9 @@ public class RunicNpcCommand implements CommandExecutor {
                                     Npc npc = Plugin.getNpcs().get(Integer.parseInt(args[1]));
                                     Plugin.getNpcs().remove(Integer.parseInt(args[1]));
                                     Plugin.getNpcEntities().remove(npc.getEntityPlayer());
+                                    NpcHandler.removeNpcForPlayers(npc);
                                     NpcHandler.removeNpcFromGrid(npc);
+                                    ScoreboardHandler.removeNpcName(npc);
                                     npc.delete();
                                     Plugin.updateNpcs();
                                     ConfigUtil.deleteNpc(Integer.parseInt(args[1]), Plugin.getFileConfig());

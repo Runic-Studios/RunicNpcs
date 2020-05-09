@@ -11,9 +11,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 public class Plugin extends JavaPlugin {
 
@@ -29,23 +27,35 @@ public class Plugin extends JavaPlugin {
         instance = this;
         Bukkit.getPluginManager().registerEvents(new EventNpcInteract(), this);
         Bukkit.getPluginManager().registerEvents(new NpcHandler(), this);
+        Bukkit.getPluginManager().registerEvents(new ScoreboardHandler(), this);
         Bukkit.getPluginCommand("runicnpc").setExecutor(new RunicNpcCommand());
         if (!this.getDataFolder().exists()) {
             this.getDataFolder().mkdir();
         }
-        config = ConfigUtil.getYamlConfigFile("npcs.yml", this.getDataFolder());
-        nextId = ConfigUtil.loadNextId(config);
-        ConfigUtil.loadNpcs(config);
-        Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, new Runnable() {
+        Bukkit.getScheduler().runTaskAsynchronously(instance, new Runnable() {
             @Override
             public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    if (NpcHandler.hasLoadedDataForPlayer(player)) {
-                        NpcHandler.updateNpcsForPlayer(player);
+                config = ConfigUtil.getYamlConfigFile("npcs.yml", instance.getDataFolder());
+                nextId = ConfigUtil.loadNextId(config);
+                Bukkit.getScheduler().runTask(instance, new Runnable() {
+                    @Override
+                    public void run() {
+                        ConfigUtil.loadNpcs(config);
+                        ScoreboardHandler.initScoreboard();
+                        Bukkit.getScheduler().scheduleAsyncRepeatingTask(Plugin.this, new Runnable() {
+                            @Override
+                            public void run() {
+                                for (Player player : Bukkit.getOnlinePlayers()) {
+                                    if (NpcHandler.hasLoadedDataForPlayer(player)) {
+                                        NpcHandler.updateNpcsForPlayer(player);
+                                    }
+                                }
+                            }
+                        }, 7 * 20, 7 * 20);
                     }
-                }
+                });
             }
-        }, 7 * 20, 7 * 20);
+        });
     }
 
     @Override

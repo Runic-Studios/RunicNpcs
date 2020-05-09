@@ -30,7 +30,7 @@ public class Npc {
         this.id = id;
         this.skin = skin;
         this.uuid = uuid;
-        gameProfile = new GameProfile(UUID.fromString(uuid), "npc");
+        gameProfile = new GameProfile(UUID.fromString(uuid), "npc_" + id);
         PropertyMap properties = gameProfile.getProperties();
         if (properties.get("textures").iterator().hasNext()) {
             properties.remove("textures", properties.get("textures").iterator().next());

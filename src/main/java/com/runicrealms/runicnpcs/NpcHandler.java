@@ -14,7 +14,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 
 public class NpcHandler implements Listener {
 
@@ -25,7 +24,6 @@ public class NpcHandler implements Listener {
     public static void placeNpcsInGrid(Map<Integer, Npc> npcs) {
         for (Map.Entry<Integer, Npc> entry : npcs.entrySet()) {
             grid.insert(entry.getValue());
-            GridLocation location = grid.getGridLocationFromLocation(entry.getValue().getLocation());
         }
     }
 
@@ -36,6 +34,18 @@ public class NpcHandler implements Listener {
             return;
         }
         throw new IllegalArgumentException("Npc not in grid!");
+    }
+
+    public static void createNpcForPlayers(Npc npc) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            loadedNpcs.get(player).put(npc, false);
+        }
+    }
+
+    public static void removeNpcForPlayers(Npc npc) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            loadedNpcs.get(player).remove(npc);
+        }
     }
 
     public static void placeNpcInGrid(Npc npc) {
