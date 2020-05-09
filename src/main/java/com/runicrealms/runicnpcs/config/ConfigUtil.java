@@ -41,44 +41,39 @@ public class ConfigUtil {
     }
 
     public static void loadNpcs(FileConfiguration config) {
-        Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                Map<Integer, Npc> npcs = new HashMap<Integer, Npc>();
-                if (config.contains("npcs")) {
-                    ConfigurationSection npcsSection = config.getConfigurationSection("npcs");
-                    for (String key : npcsSection.getKeys(false)) {
-                        Hologram hologram = HologramsAPI.createHologram(Plugin.getInstance(), new Location(
-                                Bukkit.getWorld(npcsSection.getString(key + ".hologram.world")),
-                                Double.parseDouble(npcsSection.getString(key + ".hologram.x")),
-                                Double.parseDouble(npcsSection.getString(key + ".hologram.y")),
-                                Double.parseDouble(npcsSection.getString(key + ".hologram.z"))));
-                        hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + npcsSection.getString(key + ".hologram.name")));
-                        hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&7" + npcsSection.getString(key + ".hologram.label")));
-                        String uuid = npcsSection.getString(key + ".uuid");
-                        while (Plugin.uuidInUse(uuid)) {
-                            uuid = UUID.randomUUID().toString();
-                        }
-                        npcs.put(Integer.parseInt(key), new Npc(
-                                new Location(
-                                        Bukkit.getWorld(npcsSection.getString(key + ".location.world")),
-                                        Double.parseDouble(npcsSection.getString(key + ".location.x")),
-                                        Double.parseDouble(npcsSection.getString(key + ".location.y")),
-                                        Double.parseDouble(npcsSection.getString(key + ".location.z")),
-                                        Float.parseFloat(npcsSection.getString(key + ".location.yaw")),
-                                        Float.parseFloat(npcsSection.getString(key + ".location.pitch"))),
-                                new Skin(npcsSection.getString(key + ".skin-texture"), npcsSection.getString(key + ".skin-signature")),
-                                Integer.parseInt(key),
-                                hologram,
-                                uuid));
-                    }
+        Map<Integer, Npc> npcs = new HashMap<Integer, Npc>();
+        if (config.contains("npcs")) {
+            ConfigurationSection npcsSection = config.getConfigurationSection("npcs");
+            for (String key : npcsSection.getKeys(false)) {
+                Hologram hologram = HologramsAPI.createHologram(Plugin.getInstance(), new Location(
+                        Bukkit.getWorld(npcsSection.getString(key + ".hologram.world")),
+                        Double.parseDouble(npcsSection.getString(key + ".hologram.x")),
+                        Double.parseDouble(npcsSection.getString(key + ".hologram.y")),
+                        Double.parseDouble(npcsSection.getString(key + ".hologram.z"))));
+                hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + npcsSection.getString(key + ".hologram.name")));
+                hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&7" + npcsSection.getString(key + ".hologram.label")));
+                String uuid = npcsSection.getString(key + ".uuid");
+                while (Plugin.uuidInUse(uuid)) {
+                    uuid = UUID.randomUUID().toString();
                 }
-                Plugin.setNpcs(npcs);
-                Plugin.setNpcEntityIds(sortNpcsByEntity(npcs));
-                NpcHandler.placeNpcsInGrid(npcs);
-                Bukkit.getLogger().log(Level.INFO, "[RunicNpcs] NPCs have been loaded!");
+                npcs.put(Integer.parseInt(key), new Npc(
+                        new Location(
+                                Bukkit.getWorld(npcsSection.getString(key + ".location.world")),
+                                Double.parseDouble(npcsSection.getString(key + ".location.x")),
+                                Double.parseDouble(npcsSection.getString(key + ".location.y")),
+                                Double.parseDouble(npcsSection.getString(key + ".location.z")),
+                                Float.parseFloat(npcsSection.getString(key + ".location.yaw")),
+                                Float.parseFloat(npcsSection.getString(key + ".location.pitch"))),
+                        new Skin(npcsSection.getString(key + ".skin-texture"), npcsSection.getString(key + ".skin-signature")),
+                        Integer.parseInt(key),
+                        hologram,
+                        uuid));
             }
-        });
+        }
+        Plugin.setNpcs(npcs);
+        Plugin.setNpcEntityIds(sortNpcsByEntity(npcs));
+        NpcHandler.placeNpcsInGrid(npcs);
+        Bukkit.getLogger().log(Level.INFO, "[RunicNpcs] NPCs have been loaded!");
     }
 
     private static Map<EntityPlayer, Npc> sortNpcsByEntity(Map<Integer, Npc> npcs) {

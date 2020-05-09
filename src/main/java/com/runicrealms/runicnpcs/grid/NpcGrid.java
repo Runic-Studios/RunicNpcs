@@ -20,8 +20,8 @@ public class NpcGrid extends Grid<Npc> {
 
     public GridLocation getGridLocationFromLocation(Location location) {
         return new GridLocation(this,
-                (short) (Math.floor(location.getBlockX() * this.blocksPerBox) / this.blocksPerBox),
-                (short) (Math.floor(location.getBlockZ() * this.blocksPerBox) / this.blocksPerBox));
+                (short) (location.getBlockX() / this.blocksPerBox),
+                (short) (location.getBlockZ() / this.blocksPerBox));
     }
 
     public void insert(Npc npc) {

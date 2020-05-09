@@ -14,6 +14,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 public class NpcHandler implements Listener {
 
@@ -24,6 +25,7 @@ public class NpcHandler implements Listener {
     public static void placeNpcsInGrid(Map<Integer, Npc> npcs) {
         for (Map.Entry<Integer, Npc> entry : npcs.entrySet()) {
             grid.insert(entry.getValue());
+            GridLocation location = grid.getGridLocationFromLocation(entry.getValue().getLocation());
         }
     }
 
@@ -46,10 +48,12 @@ public class NpcHandler implements Listener {
             if (entry.getValue() == true) {
                 if (!surrounding.contains(entry.getKey())) {
                     entry.getKey().despawnForPlayer(player);
+                    loadedNpcs.get(player).put(entry.getKey(), false);
                 }
             } else {
                 if (surrounding.contains(entry.getKey())) {
                     entry.getKey().spawnForPlayer(player);
+                    loadedNpcs.get(player).put(entry.getKey(), true);
                 }
             }
         }
