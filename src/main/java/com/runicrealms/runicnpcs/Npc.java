@@ -43,6 +43,7 @@ public class Npc {
         this.entityPlayer.playerConnection = new PlayerConnection(minecraftServer, new NetworkManager(EnumProtocolDirection.CLIENTBOUND), this.entityPlayer);
         this.entityPlayer.setHealth(1f);
         this.entityPlayer.getBukkitEntity().setMetadata("NPC", new FixedMetadataValue(Plugin.getInstance(), true));
+        this.entityPlayer.setNoGravity(true);
         this.entityPlayer.setLocation(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch());
         this.watcher = this.entityPlayer.getDataWatcher();
         this.watcher.set(new DataWatcherObject<Byte>(16, DataWatcherRegistry.a), new Byte((byte) 127));
@@ -54,6 +55,7 @@ public class Npc {
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, this.entityPlayer));
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutNamedEntitySpawn(this.entityPlayer));
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityMetadata(this.entityPlayer.getId(), this.watcher, true));
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityHeadRotation(this.entityPlayer, (byte) ((this.location.getYaw() * 256.0F) / 360.0F)));
     }
 
     public void despawnForPlayer(Player player) {
