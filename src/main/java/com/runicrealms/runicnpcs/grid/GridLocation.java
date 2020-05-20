@@ -7,15 +7,16 @@ public class GridLocation {
 
     private short x;
     private short y;
+    @SuppressWarnings("rawtypes")
     private Grid grid;
 
-    public GridLocation(Grid grid, short x, short y) {
+    public GridLocation(@SuppressWarnings("rawtypes") Grid grid, short x, short y) {
         this.grid = grid;
         this.x = x;
         this.y = y;
     }
 
-    public Grid getGrid() {
+    public @SuppressWarnings("rawtypes") Grid getGrid() {
         return this.grid;
     }
 
@@ -31,7 +32,7 @@ public class GridLocation {
         return (this.x << 16) | (this.y & 0xFFFF);
     }
 
-    public static GridLocation decodeFromInt(Grid grid, int encoded) {
+    public static GridLocation decodeFromInt(@SuppressWarnings("rawtypes") Grid grid, int encoded) {
         return new GridLocation(grid, (short) (encoded >> 16), (short) (encoded & 0xFFFF));
     }
 

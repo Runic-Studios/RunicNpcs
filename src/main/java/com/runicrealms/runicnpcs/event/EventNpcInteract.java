@@ -26,8 +26,8 @@ public class EventNpcInteract implements Listener {
     public void onClick(PlayerInteractEntityEvent event) {
         if (event.getHand().equals(EquipmentSlot.HAND)) {
             if (event.getRightClicked().getType() == EntityType.PLAYER) {
-                if (Plugin.getNpcEntities().containsKey(((CraftPlayer) event.getRightClicked()).getHandle().getId())) {
-                    Bukkit.getServer().getPluginManager().callEvent(new NpcClickEvent(Plugin.getNpcEntities().get(((CraftPlayer) event.getRightClicked()).getHandle().getId()), event.getPlayer()));
+                if (Plugin.getNpcEntities().containsKey(((CraftPlayer) event.getRightClicked()).getHandle())) {
+                    Bukkit.getServer().getPluginManager().callEvent(new NpcClickEvent(Plugin.getNpcEntities().get(((CraftPlayer) event.getRightClicked()).getHandle()), event.getPlayer()));
                 }
             }
         }

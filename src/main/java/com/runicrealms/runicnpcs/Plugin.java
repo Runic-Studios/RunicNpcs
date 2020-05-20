@@ -38,7 +38,8 @@ public class Plugin extends JavaPlugin {
                 config = ConfigUtil.getYamlConfigFile("npcs.yml", instance.getDataFolder());
                 nextId = ConfigUtil.loadNextId(config);
                 Bukkit.getScheduler().runTask(instance, new Runnable() {
-                    @Override
+                    @SuppressWarnings("deprecation")
+					@Override
                     public void run() {
                         ConfigUtil.loadNpcs(config);
                         ScoreboardHandler.initScoreboard();
@@ -115,11 +116,14 @@ public class Plugin extends JavaPlugin {
     public static boolean uuidInUse(String uuid) {
         String url = "https://api.mojang.com/user/profiles/" + uuid.replace("-", "") + "/names";
         try {
-            Scanner scanner = new Scanner(new URL(url).openStream(), "UTF-8").useDelimiter("\\A");
-            if (scanner.hasNext()) {
-                scanner.close();
+            Scanner scanner = new Scanner(new URL(url).openStream(), "UTF-8");
+            Scanner delmitier = scanner.useDelimiter("\\A");
+            if (delmitier.hasNext()) {
+            	delmitier.close();
+            	scanner.close();
                 return true;
             }
+            delmitier.close();
             scanner.close();
         } catch (IOException exception) {
             exception.printStackTrace();
