@@ -50,7 +50,7 @@ public class ConfigUtil {
                         Double.parseDouble(npcsSection.getString(key + ".hologram.x")),
                         Double.parseDouble(npcsSection.getString(key + ".hologram.y")),
                         Double.parseDouble(npcsSection.getString(key + ".hologram.z"))));
-                hologram.appendTextLine("&e" + npcsSection.getString(key + ".hologram.name"));
+                hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + npcsSection.getString(key + ".hologram.name")));
                 String color = "";
                 String colored = ChatColor.translateAlternateColorCodes('&', npcsSection.getString(key + ".hologram.label"));
                 if (ChatColor.stripColor(colored).equalsIgnoreCase(colored)) {
