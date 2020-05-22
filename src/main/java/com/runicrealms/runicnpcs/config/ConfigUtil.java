@@ -50,8 +50,19 @@ public class ConfigUtil {
                         Double.parseDouble(npcsSection.getString(key + ".hologram.x")),
                         Double.parseDouble(npcsSection.getString(key + ".hologram.y")),
                         Double.parseDouble(npcsSection.getString(key + ".hologram.z"))));
-                hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + npcsSection.getString(key + ".hologram.name")));
-                hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&7" + npcsSection.getString(key + ".hologram.label")));
+                hologram.appendTextLine("&e" + npcsSection.getString(key + ".hologram.name"));
+                String color = "";
+                String colored = ChatColor.translateAlternateColorCodes('&', npcsSection.getString(key + ".hologram.label"));
+                if (ChatColor.stripColor(colored).equalsIgnoreCase(colored)) {
+                    if (colored.equalsIgnoreCase("Merchant")) {
+                        color = "&a";
+                    } else if (colored.equalsIgnoreCase("Quest")) {
+                        color = "&6";
+                    } else {
+                        color = "&7";
+                    }
+                }
+                hologram.appendTextLine(color + npcsSection.getString(key + ".hologram.label"));
                 String uuid = npcsSection.getString(key + ".uuid");
                 while (Plugin.uuidInUse(uuid)) {
                     uuid = UUID.randomUUID().toString();
