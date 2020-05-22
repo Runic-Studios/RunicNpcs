@@ -47,9 +47,9 @@ public class RunicNpcCommand implements CommandExecutor {
                                                 Location npcLocation = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getBlockY(), player.getLocation().getBlockZ() + 0.5, player.getLocation().getYaw(), player.getLocation().getPitch());
                                                 Hologram hologram = HologramsAPI.createHologram(Plugin.getInstance(), new Location(npcLocation.getWorld(), npcLocation.getX(), npcLocation.getY() + 2.5, npcLocation.getZ()));
                                                 hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + args[1].replaceAll("_", " ")));
-                                                hologram.appendTextLine(
+                                                hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&',
                                                         (args[2].equalsIgnoreCase("Merchant") ? "&a" : (args[2].equalsIgnoreCase("Quest") ? "&6" : "&7")) +
-                                                                args[2].replaceAll("_", " "));
+                                                                args[2].replaceAll("_", " ")));
                                                 Integer id = new Integer(Plugin.getNextId());
                                                 Npc npc = new Npc(npcLocation, skin, id, hologram, finalUuid);
                                                 ConfigUtil.saveNpc(npc, Plugin.getFileConfig());

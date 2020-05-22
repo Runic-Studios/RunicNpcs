@@ -62,7 +62,7 @@ public class ConfigUtil {
                         color = "&7";
                     }
                 }
-                hologram.appendTextLine(color + npcsSection.getString(key + ".hologram.label"));
+                hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', color + npcsSection.getString(key + ".hologram.label")));
                 String uuid = npcsSection.getString(key + ".uuid");
                 while (Plugin.uuidInUse(uuid)) {
                     uuid = UUID.randomUUID().toString();
