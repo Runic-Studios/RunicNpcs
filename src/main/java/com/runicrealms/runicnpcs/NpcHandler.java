@@ -3,7 +3,7 @@ package com.runicrealms.runicnpcs;
 import com.runicrealms.runicnpcs.grid.GridBounds;
 import com.runicrealms.runicnpcs.grid.GridLocation;
 import com.runicrealms.runicnpcs.grid.NpcGrid;
-import net.minecraft.server.v1_15_R1.EntityPlayer;
+import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

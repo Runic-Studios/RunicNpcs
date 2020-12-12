@@ -2,7 +2,7 @@ package com.runicrealms.runicnpcs.api;
 
 import com.runicrealms.runicnpcs.Npc;
 import com.runicrealms.runicnpcs.Plugin;
-import net.minecraft.server.v1_15_R1.EntityPlayer;
+import net.minecraft.server.v1_16_R3.EntityPlayer;
 
 public class RunicNpcsAPI {
 

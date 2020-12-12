@@ -79,9 +79,9 @@
 		<dependency>
 			<groupId>org.bukkit</groupId>
 			<artifactId>craftbukkit</artifactId>
-			<version>1.15.2</version>
+			<version>1.16.4</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/craftbukkit-1.15.2.jar</systemPath>
+			<systemPath>${project.basedir}/lib/craftbukkit-1.16.4.jar</systemPath>
 		</dependency>
 		<!-- Spigot API -->
 		<dependency>

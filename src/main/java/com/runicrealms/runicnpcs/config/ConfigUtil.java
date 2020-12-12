@@ -7,7 +7,7 @@ import com.runicrealms.runicnpcs.Npc;
 import com.runicrealms.runicnpcs.NpcHandler;
 import com.runicrealms.runicnpcs.Plugin;
 import com.runicrealms.runicnpcs.Skin;
-import net.minecraft.server.v1_15_R1.EntityPlayer;
+import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;

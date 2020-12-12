@@ -1,11 +1,13 @@
 package com.runicrealms.runicnpcs;
 
-import net.minecraft.server.v1_15_R1.PacketPlayOutScoreboardTeam;
-import net.minecraft.server.v1_15_R1.ScoreboardTeam;
-import net.minecraft.server.v1_15_R1.ScoreboardTeamBase;
+
+import net.minecraft.server.v1_16_R3.PacketPlayOutScoreboardTeam;
+import net.minecraft.server.v1_16_R3.ScoreboardTeam;
+import net.minecraft.server.v1_16_R3.ScoreboardTeamBase;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_15_R1.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_15_R1.scoreboard.CraftScoreboard;
+
+import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
+import org.bukkit.craftbukkit.v1_16_R3.scoreboard.CraftScoreboard;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
