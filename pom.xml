@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.runicrealms.runicnpcs.Plugin</groupId>
 	<artifactId>RunicNpcs</artifactId>
-	<version>1.15.2</version>
+	<version>1.16.4</version>
 	<name>RunicNpcs</name>
 	<description>Runic Realms NPCs Plugin</description>
 

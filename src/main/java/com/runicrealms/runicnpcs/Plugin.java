@@ -17,8 +17,8 @@ public class Plugin extends JavaPlugin {
 
     private static Plugin instance;
 
-    private static Map<Integer, Npc> npcs = new HashMap<Integer, Npc>();
-    private static Map<EntityPlayer, Npc> npcEntities = new HashMap<EntityPlayer, Npc>();
+    private static Map<Integer, Npc> npcs = new HashMap<>();
+    private static Map<EntityPlayer, Npc> npcEntities = new HashMap<>();
     private static FileConfiguration config;
     private static Integer nextId;
 
@@ -67,12 +67,9 @@ public class Plugin extends JavaPlugin {
     }
 
     public static void updateNpcs() {
-        Bukkit.getScheduler().runTaskAsynchronously(instance, new Runnable() {
-            @Override
-            public void run() {
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    NpcHandler.updateNpcsForPlayer(player);
-                }
+        Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                NpcHandler.updateNpcsForPlayer(player);
             }
         });
     }
@@ -92,12 +89,7 @@ public class Plugin extends JavaPlugin {
     public static Integer getNextId() {
         final Integer current = new Integer(nextId);
         final Integer next = new Integer(++nextId);
-        Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                getFileConfig().set("next-id", next);
-            }
-        });
+        Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> getFileConfig().set("next-id", next));
         return current;
     }
 
