@@ -116,4 +116,8 @@ public class Npc {
         return this.shown;
     }
 
+    public void setShown(boolean shown) {
+        this.shown = shown;
+    }
+
 }
