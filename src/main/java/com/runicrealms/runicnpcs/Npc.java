@@ -118,6 +118,7 @@ public class Npc {
 
     public void setShown(boolean shown) {
         this.shown = shown;
+        Plugin.updateNpcs();
     }
 
 }
