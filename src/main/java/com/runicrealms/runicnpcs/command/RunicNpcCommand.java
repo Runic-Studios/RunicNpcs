@@ -34,7 +34,7 @@ public class RunicNpcCommand implements CommandExecutor {
                             Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), new Runnable() {
                                 @Override
                                 public void run() {
-                                    Skin skin = getMineskinSkin(args[3]);
+                                    Skin skin = MineskinUtil.getMineskinSkin(args[3]);
                                     if (skin != null) {
                                         String uuid = UUID.randomUUID().toString();
                                         while (Plugin.uuidInUse(uuid)) {
@@ -146,25 +146,6 @@ public class RunicNpcCommand implements CommandExecutor {
             return true;
         } catch (Exception exception) {
             return false;
-        }
-    }
-
-    private static Skin getMineskinSkin(String id) {
-        String url = "https://api.mineskin.org/get/id/" + id;
-        try {
-            Scanner scanner = new Scanner(new URL(url).openStream(), "UTF-8");
-            Scanner withDelimiter = scanner.useDelimiter("\\A");
-            JSONObject object = (JSONObject) JSONValue.parseWithException(scanner.next());
-            JSONObject data = (JSONObject) object.get("data");
-            JSONObject texture = (JSONObject) data.get("texture");
-            String value = (String) texture.get("value");
-            String signature = (String) texture.get("signature");
-            scanner.close();
-            withDelimiter.close();
-            return new Skin(value, signature);
-        } catch (Exception exception) {
-            exception.printStackTrace();
-            return null;
         }
     }
 
