@@ -12,12 +12,8 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 
-import java.net.URL;
 import java.util.Map;
-import java.util.Scanner;
 import java.util.UUID;
 
 public class RunicNpcCommand implements CommandExecutor {
@@ -51,7 +47,7 @@ public class RunicNpcCommand implements CommandExecutor {
                                                         (args[2].equalsIgnoreCase("Merchant") ? "&a" : (args[2].equalsIgnoreCase("Quest") ? "&6" : "&7")) +
                                                                 args[2].replaceAll("_", " ")));
                                                 Integer id = new Integer(Plugin.getNextId());
-                                                Npc npc = new Npc(npcLocation, skin, id, hologram, finalUuid);
+                                                Npc npc = new Npc(npcLocation, skin, id, hologram, finalUuid, true);
                                                 ConfigUtil.saveNpc(npc, Plugin.getFileConfig());
                                                 Plugin.getNpcs().put(npc.getId(), npc);
                                                 Plugin.getNpcEntities().put(npc.getEntityPlayer(), npc);

@@ -55,13 +55,13 @@ public class NpcHandler implements Listener {
     public static void updateNpcsForPlayer(Player player) {
         Set<Npc> surrounding = grid.getNearbyNpcs(player.getLocation());
         for (Map.Entry<Npc, Boolean> entry : loadedNpcs.get(player).entrySet()) {
-            if (entry.getValue() == true) {
-                if (!surrounding.contains(entry.getKey())) {
+            if (entry.getValue()) {
+                if ((!surrounding.contains(entry.getKey())) || (!entry.getKey().isShown())) {
                     entry.getKey().despawnForPlayer(player);
                     loadedNpcs.get(player).put(entry.getKey(), false);
                 }
             } else {
-                if (surrounding.contains(entry.getKey())) {
+                if (surrounding.contains(entry.getKey()) && entry.getKey().isShown()) {
                     entry.getKey().spawnForPlayer(player);
                     loadedNpcs.get(player).put(entry.getKey(), true);
                 }

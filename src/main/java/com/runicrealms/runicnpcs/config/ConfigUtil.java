@@ -78,7 +78,8 @@ public class ConfigUtil {
                         new Skin(npcsSection.getString(key + ".skin-texture"), npcsSection.getString(key + ".skin-signature")),
                         Integer.parseInt(key),
                         hologram,
-                        uuid));
+                        uuid,
+                        npcsSection.getBoolean(key + ".shown")));
             }
         }
         Plugin.setNpcs(npcs);
@@ -114,6 +115,7 @@ public class ConfigUtil {
                 config.set("npcs." + npc.getId() + ".skin-texture", npc.getSkin().getTexture());
                 config.set("npcs." + npc.getId() + ".skin-signature", npc.getSkin().getSignature());
                 config.set("npcs." + npc.getId() + ".uuid", npc.getUuid());
+                config.set("npcs." + npc.isShown() + ".shown", npc.isShown());
                 try {
                     config.save(new File(Plugin.getInstance().getDataFolder(), "npcs.yml"));
                 } catch (IOException e) {

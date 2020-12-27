@@ -5,7 +5,6 @@ import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.runicrealms.runicnpcs.*;
 import com.runicrealms.runicnpcs.config.ConfigUtil;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 
@@ -21,7 +20,7 @@ public class RunicNpcsAPI {
         return Plugin.getNpcs().get(id);
     }
 
-    public static Npc createNpc(Location location, String name, String label, String skinId) { // DONT RUN ON MAIN THREAD!!!!
+    public static Npc createNpc(Location location, String name, String label, String skinId, boolean shown) { // DONT RUN ON MAIN THREAD!!!!
         Skin skin = MineskinUtil.getMineskinSkin(skinId);
         if (skin != null) {
             String uuid = UUID.randomUUID().toString();
@@ -35,7 +34,7 @@ public class RunicNpcsAPI {
                     (label.equalsIgnoreCase("Merchant") ? "&a" : (label.equalsIgnoreCase("Quest") ? "&6" : "&7")) +
                             label.replaceAll("_", " ")));
             Integer id = new Integer(Plugin.getNextId());
-            Npc npc = new Npc(location, skin, id, hologram, finalUuid);
+            Npc npc = new Npc(location, skin, id, hologram, finalUuid, shown);
             ConfigUtil.saveNpc(npc, Plugin.getFileConfig());
             Plugin.getNpcs().put(npc.getId(), npc);
             Plugin.getNpcEntities().put(npc.getEntityPlayer(), npc);

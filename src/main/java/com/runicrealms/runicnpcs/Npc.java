@@ -40,7 +40,9 @@ public class Npc {
     private Skin skin;
     private String uuid;
 
-    public Npc(Location location, Skin skin, Integer id, Hologram hologram, String uuid) {
+    private boolean shown;
+
+    public Npc(Location location, Skin skin, Integer id, Hologram hologram, String uuid, boolean shown) {
         this.id = id;
         this.skin = skin;
         this.uuid = uuid;
@@ -63,6 +65,7 @@ public class Npc {
         this.watcher.set(new DataWatcherObject<Byte>(16, DataWatcherRegistry.a), (byte) 127);
         worldServer.addEntity(this.entityPlayer);
         this.hologram = hologram;
+        this.shown = shown;
     }
 
     public void spawnForPlayer(Player player) {
@@ -107,6 +110,10 @@ public class Npc {
 
     public EntityPlayer getEntityPlayer() {
         return this.entityPlayer;
+    }
+
+    public boolean isShown() {
+        return this.shown;
     }
 
 }
