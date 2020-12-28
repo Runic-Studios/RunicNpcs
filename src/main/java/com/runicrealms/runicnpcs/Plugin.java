@@ -3,6 +3,7 @@ package com.runicrealms.runicnpcs;
 import com.runicrealms.runicnpcs.command.RunicNpcCommand;
 import com.runicrealms.runicnpcs.config.ConfigUtil;
 import com.runicrealms.runicnpcs.event.EventNpcInteract;
+import com.runicrealms.runicrestart.api.RunicRestartApi;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -43,6 +44,7 @@ public class Plugin extends JavaPlugin {
                     public void run() {
                         ConfigUtil.loadNpcs(config);
                         ScoreboardHandler.initScoreboard();
+                        RunicRestartApi.markPluginLoaded("npcs");
                         Bukkit.getScheduler().scheduleAsyncRepeatingTask(Plugin.this, new Runnable() {
                             @Override
                             public void run() {
