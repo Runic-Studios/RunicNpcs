@@ -115,7 +115,7 @@ public class ConfigUtil {
                 config.set("npcs." + npc.getId() + ".skin-texture", npc.getSkin().getTexture());
                 config.set("npcs." + npc.getId() + ".skin-signature", npc.getSkin().getSignature());
                 config.set("npcs." + npc.getId() + ".uuid", npc.getUuid());
-                config.set("npcs." + npc.isShown() + ".shown", npc.isShown());
+                config.set("npcs." + npc.getId() + ".shown", npc.isShown());
                 try {
                     config.save(new File(Plugin.getInstance().getDataFolder(), "npcs.yml"));
                 } catch (IOException e) {
