@@ -96,12 +96,14 @@ public class RunicNpcCommand implements CommandExecutor {
                                 double closest = -1;
                                 Npc closestNpc = null;
                                 for (Map.Entry<Integer, Npc> entry : Plugin.getNpcs().entrySet()) {
-                                    if (closest == -1) {
-                                        closest = player.getLocation().distanceSquared(entry.getValue().getLocation());
-                                        closestNpc = entry.getValue();
-                                    } else if (player.getLocation().distanceSquared(entry.getValue().getLocation()) < closest) {
-                                        closest = player.getLocation().distanceSquared(entry.getValue().getLocation());
-                                        closestNpc = entry.getValue();
+                                    if (player.getLocation().getWorld() == entry.getValue().getLocation().getWorld()) {
+                                        if (closest == -1) {
+                                            closest = player.getLocation().distanceSquared(entry.getValue().getLocation());
+                                            closestNpc = entry.getValue();
+                                        } else if (player.getLocation().distanceSquared(entry.getValue().getLocation()) < closest) {
+                                            closest = player.getLocation().distanceSquared(entry.getValue().getLocation());
+                                            closestNpc = entry.getValue();
+                                        }
                                     }
                                 }
                                 if (closest != -1) {
