@@ -67,7 +67,7 @@ public class ConfigUtil {
                 while (Plugin.uuidInUse(uuid)) {
                     uuid = UUID.randomUUID().toString();
                 }
-                npcs.put(Integer.parseInt(key), new Npc(
+                Npc npc = new Npc(
                         new Location(
                                 Bukkit.getWorld(npcsSection.getString(key + ".location.world")),
                                 Double.parseDouble(npcsSection.getString(key + ".location.x")),
@@ -79,7 +79,8 @@ public class ConfigUtil {
                         Integer.parseInt(key),
                         hologram,
                         uuid,
-                        npcsSection.getBoolean(key + ".shown")));
+                        !npcsSection.contains(key + ".shown") || npcsSection.getBoolean(key + ".shown"));
+                npcs.put(Integer.parseInt(key), npc);
             }
         }
         Plugin.setNpcs(npcs);
