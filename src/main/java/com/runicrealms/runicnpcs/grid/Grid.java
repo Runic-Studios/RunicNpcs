@@ -5,50 +5,58 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public abstract class Grid<E> {
+public class Grid<E> {
 
-    private GridBounds bounds;
-    private Map<Integer, Set<E>> grid = new HashMap<Integer, Set<E>>();
+    private final GridBounds bounds;
+    private final Map<Short, Map<Short, Set<E>>> map;
 
     public Grid(GridBounds bounds) {
         this.bounds = bounds;
+        this.map = new HashMap<>();
     }
 
-    protected void insert(GridLocation location, E element) {
-        int encoded = location.encodeToInt();
-        if (!this.grid.containsKey(encoded)) {
-            this.grid.put(encoded, new HashSet<E>());
+    public void insertElement(GridLocation gridLocation, E element) {
+        if (!this.map.containsKey(gridLocation.getX())) {
+            this.map.put(gridLocation.getX(), new HashMap<>());
         }
-        this.grid.get(encoded).add(element);
+        if (!this.map.get(gridLocation.getX()).containsKey(gridLocation.getY())) {
+            this.map.get(gridLocation.getX()).put(gridLocation.getY(), new HashSet<E>());
+        }
+        this.map.get(gridLocation.getX()).get(gridLocation.getY()).add(element);
     }
 
-    protected Set<E> getSurroundingElements(GridLocation location) {
-        Set<E> surrounding = new HashSet<E>();
-        int encoded = location.encodeToInt();
-        if (this.grid.containsKey(encoded)) {
-            surrounding.addAll(this.grid.get(encoded));
-        }
-        for (Integer surrounder : location.getSurrounding()) {
-            if (this.grid.containsKey(surrounder)) {
-                surrounding.addAll(this.grid.get(surrounder));
+    public Set<E> getSurroundingElements(GridLocation gridLocation, final short distance) {
+        Set<E> elements = new HashSet<E>();
+        for (short i = (short) (Math.abs(distance) * -1 + gridLocation.getX()); i < Math.abs(distance) + gridLocation.getX(); i++) {
+            for (short j = (short) (Math.abs(distance) * -1 + gridLocation.getY()); j < Math.abs(distance) + gridLocation.getY(); j++) {
+                if (!this.map.containsKey(i)) continue;
+                if (!this.map.get(i).containsKey(j)) continue;
+                elements.addAll(this.map.get(i).get(j));
             }
         }
-        return surrounding;
+        return elements;
+    }
+
+    public Set<E> getSurroundingElements(GridLocation gridLocation) {
+        return this.getSurroundingElements(gridLocation, (short) 1);
     }
 
     public boolean containsElementInGrid(GridLocation location, E element) {
-        int encoded = location.encodeToInt();
-        if (!this.grid.containsKey(encoded)) {
-            return false;
-        }
-        if (this.grid.get(encoded).contains(element)) {
-            return true;
-        }
-        return false;
+        if (!this.map.containsKey(location.getX())) return false;
+        if (!this.map.get(location.getX()).containsKey(location.getY())) return false;
+        return this.map.get(location.getX()).get(location.getY()).contains(element);
     }
 
-    public void removeElementInGrid(GridLocation location, E element) {
-        this.grid.get(location.encodeToInt()).remove(element);
+    public Set<E> getElements(GridLocation gridLocation) {
+        if (!this.map.containsKey(gridLocation.getX())) return new HashSet<E>();
+        if (!this.map.get(gridLocation.getX()).containsKey(gridLocation.getY())) return new HashSet<E>();
+        return map.get(gridLocation.getX()).get(gridLocation.getY());
+    }
+
+    public void removeElement(GridLocation gridLocation, E element) {
+        if (!this.map.containsKey(gridLocation.getX())) return;
+        if (!this.map.get(gridLocation.getX()).containsKey(gridLocation.getY())) return;
+        this.map.get(gridLocation.getX()).get(gridLocation.getY()).remove(element);
     }
 
     public GridBounds getBounds() {

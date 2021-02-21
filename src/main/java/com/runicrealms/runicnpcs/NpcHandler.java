@@ -2,7 +2,7 @@ package com.runicrealms.runicnpcs;
 
 import com.runicrealms.runicnpcs.grid.GridBounds;
 import com.runicrealms.runicnpcs.grid.GridLocation;
-import com.runicrealms.runicnpcs.grid.NpcGrid;
+import com.runicrealms.runicnpcs.grid.MultiWorldGrid;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -19,18 +19,17 @@ public class NpcHandler implements Listener {
 
     private static Map<Player, Map<Npc, Boolean>> loadedNpcs = new HashMap<Player, Map<Npc, Boolean>>();
 
-    private static NpcGrid grid = new NpcGrid(new GridBounds(-4096, -4096, 4096, 4096), (short) 32);
+    private static final MultiWorldGrid<Npc> grid = new MultiWorldGrid<Npc>(new GridBounds(-4096, -4096, 4096, 4096), (short) 32);
 
     public static void placeNpcsInGrid(Map<Integer, Npc> npcs) {
         for (Map.Entry<Integer, Npc> entry : npcs.entrySet()) {
-            grid.insert(entry.getValue());
+            grid.insertElement(entry.getValue().getLocation(), entry.getValue());
         }
     }
 
     public static void removeNpcFromGrid(Npc npc) {
-        GridLocation location = grid.getGridLocationFromLocation(npc.getLocation());
-        if (grid.containsElementInGrid(location, npc)) {
-            grid.removeElementInGrid(location, npc);
+        if (grid.containsElementInGrid(npc.getLocation(), npc)) {
+            grid.removeElement(npc.getLocation(), npc);
             return;
         }
         throw new IllegalArgumentException("Npc not in grid!");
@@ -49,11 +48,11 @@ public class NpcHandler implements Listener {
     }
 
     public static void placeNpcInGrid(Npc npc) {
-        grid.insert(npc);
+        grid.insertElement(npc.getLocation(), npc);
     }
 
     public static void updateNpcsForPlayer(Player player) {
-        Set<Npc> surrounding = grid.getNearbyNpcs(player.getLocation());
+        Set<Npc> surrounding = grid.getSurroundingElements(player.getLocation(), (short) 2);
         for (Map.Entry<Npc, Boolean> entry : loadedNpcs.get(player).entrySet()) {
             if (entry.getValue()) {
                 if ((!surrounding.contains(entry.getKey())) || (!entry.getKey().isShown())) {
@@ -71,16 +70,13 @@ public class NpcHandler implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        Bukkit.getScheduler().runTaskLaterAsynchronously(Plugin.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                HashMap<Npc, Boolean> npcs = new HashMap<Npc, Boolean>();
-                for (Map.Entry<EntityPlayer, Npc> entry : Plugin.getNpcEntities().entrySet()) {
-                    npcs.put(entry.getValue(), false);
-                }
-                loadedNpcs.put(event.getPlayer(), npcs);
-                updateNpcsForPlayer(event.getPlayer());
+        Bukkit.getScheduler().runTaskLaterAsynchronously(Plugin.getInstance(), () -> {
+            HashMap<Npc, Boolean> npcs = new HashMap<Npc, Boolean>();
+            for (Map.Entry<EntityPlayer, Npc> entry : Plugin.getNpcEntities().entrySet()) {
+                npcs.put(entry.getValue(), false);
             }
+            loadedNpcs.put(event.getPlayer(), npcs);
+            updateNpcsForPlayer(event.getPlayer());
         }, 1);
     }
 
@@ -93,7 +89,7 @@ public class NpcHandler implements Listener {
         return loadedNpcs.containsKey(player);
     }
 
-    public static NpcGrid getNpcGrid() {
+    public static MultiWorldGrid<Npc> getNpcGrid() {
         return grid;
     }
 
