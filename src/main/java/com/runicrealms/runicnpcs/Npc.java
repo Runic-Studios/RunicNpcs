@@ -29,16 +29,17 @@ import org.bukkit.metadata.FixedMetadataValue;
 
 import java.util.UUID;
 
+@SuppressWarnings("FieldCanBeLocal")
 public class Npc {
 
     public EntityPlayer entityPlayer;
-    private GameProfile gameProfile;
-    private Location location;
-    private DataWatcher watcher;
-    private int id;
-    private Hologram hologram;
-    private Skin skin;
-    private String uuid;
+    private final GameProfile gameProfile;
+    private final Location location;
+    private final DataWatcher watcher;
+    private final int id;
+    private final Hologram hologram;
+    private final Skin skin;
+    private final String uuid;
 
     private boolean shown;
 

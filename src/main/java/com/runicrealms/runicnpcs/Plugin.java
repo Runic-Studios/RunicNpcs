@@ -89,8 +89,8 @@ public class Plugin extends JavaPlugin {
     }
 
     public static Integer getNextId() {
-        final Integer current = new Integer(nextId);
-        final Integer next = new Integer(++nextId);
+        final Integer current = nextId;
+        final Integer next = ++nextId;
         Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> getFileConfig().set("next-id", next));
         return current;
     }

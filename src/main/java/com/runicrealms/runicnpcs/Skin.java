@@ -2,8 +2,8 @@ package com.runicrealms.runicnpcs;
 
 public class Skin {
 
-    private String texture;
-    private String signature;
+    private final String texture;
+    private final String signature;
 
     public Skin(String texture, String signature) {
         this.texture = texture;

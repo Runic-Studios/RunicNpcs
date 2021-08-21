@@ -20,7 +20,7 @@ public class RunicNpcsAPI {
         return Plugin.getNpcs().get(id);
     }
 
-    public static Npc createNpc(Location location, String name, String label, String skinId, boolean shown) { // DONT RUN ON MAIN THREAD!!!!
+    public static Npc createNpc(Location location, String name, String label, String skinId, boolean shown) { // DON'T RUN ON MAIN THREAD!!!!
         Skin skin = MineskinUtil.getMineskinSkin(skinId);
         if (skin != null) {
             String uuid = UUID.randomUUID().toString();
@@ -33,7 +33,7 @@ public class RunicNpcsAPI {
             hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&',
                     (label.equalsIgnoreCase("Merchant") ? "&a" : (label.equalsIgnoreCase("Quest") ? "&6" : "&7")) +
                             label.replaceAll("_", " ")));
-            Integer id = new Integer(Plugin.getNextId());
+            Integer id = Plugin.getNextId();
             Npc npc = new Npc(location, skin, id, hologram, finalUuid, shown);
             ConfigUtil.saveNpc(npc, Plugin.getFileConfig());
             Plugin.getNpcs().put(npc.getId(), npc);

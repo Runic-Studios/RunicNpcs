@@ -81,7 +81,7 @@
 			<artifactId>craftbukkit</artifactId>
 			<version>1.16.4</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/craftbukkit-1.16.4.jar</systemPath>
+			<systemPath>${project.basedir}/../lib/craftbukkit-1.16.4.jar</systemPath>
 		</dependency>
 		<!-- Spigot API -->
 		<dependency>
@@ -110,7 +110,7 @@
 			<artifactId>RunicRestart</artifactId>
 			<version>1.16.4</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/RunicRestart-1.16.4.jar</systemPath>
+			<systemPath>${project.basedir}/../lib/RunicRestart-1.16.4.jar</systemPath>
 		</dependency>
 	</dependencies>
 </project>

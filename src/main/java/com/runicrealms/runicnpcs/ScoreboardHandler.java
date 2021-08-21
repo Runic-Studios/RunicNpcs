@@ -19,12 +19,12 @@ import java.util.Map;
 
 public class ScoreboardHandler implements Listener {
 
-    private static List<String> npcNames = new ArrayList<String>();
+    private static final List<String> NPC_NAMES = new ArrayList<>();
     private static ScoreboardTeam team;
 
     public static void initScoreboard() {
         for (Map.Entry<Integer, Npc> entry : Plugin.getNpcs().entrySet()) {
-            npcNames.add(entry.getValue().getEntityPlayer().getName());
+            NPC_NAMES.add(entry.getValue().getEntityPlayer().getName());
         }
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
         team = new ScoreboardTeam(((CraftScoreboard) scoreboard).getHandle(), "npcs");
@@ -32,17 +32,17 @@ public class ScoreboardHandler implements Listener {
     }
 
     public static void addNpcName(Npc npc) {
-        npcNames.add(npc.getEntityPlayer().getName());
+        NPC_NAMES.add(npc.getEntityPlayer().getName());
     }
 
     public static void removeNpcName(Npc npc) {
-        npcNames.remove(npcNames.indexOf(npc.getEntityPlayer().getName()));
+        NPC_NAMES.remove(npc.getEntityPlayer().getName());
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         ((CraftPlayer) event.getPlayer()).getHandle().playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(team, 0));
-        ((CraftPlayer) event.getPlayer()).getHandle().playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(team, npcNames, 3));
+        ((CraftPlayer) event.getPlayer()).getHandle().playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(team, NPC_NAMES, 3));
     }
 
 }
