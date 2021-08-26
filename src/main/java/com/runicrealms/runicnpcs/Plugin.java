@@ -1,5 +1,6 @@
 package com.runicrealms.runicnpcs;
 
+import co.aikar.commands.PaperCommandManager;
 import com.runicrealms.runicnpcs.command.RunicNpcCommand;
 import com.runicrealms.runicnpcs.config.ConfigUtil;
 import com.runicrealms.runicnpcs.event.EventNpcInteract;
@@ -22,6 +23,7 @@ public class Plugin extends JavaPlugin {
     private static Map<EntityPlayer, Npc> npcEntities = new HashMap<>();
     private static FileConfiguration config;
     private static Integer nextId;
+    private static PaperCommandManager commandManager;
 
     @Override
     public void onEnable() {
@@ -29,35 +31,26 @@ public class Plugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new EventNpcInteract(), this);
         Bukkit.getPluginManager().registerEvents(new NpcHandler(), this);
         Bukkit.getPluginManager().registerEvents(new ScoreboardHandler(), this);
-        Bukkit.getPluginCommand("runicnpc").setExecutor(new RunicNpcCommand());
+        commandManager = new PaperCommandManager(this);
+        commandManager.registerCommand(new RunicNpcCommand());
         if (!this.getDataFolder().exists()) {
             this.getDataFolder().mkdir();
         }
-        Bukkit.getScheduler().runTaskAsynchronously(instance, new Runnable() {
-            @Override
-            public void run() {
-                config = ConfigUtil.getYamlConfigFile("npcs.yml", instance.getDataFolder());
-                nextId = ConfigUtil.loadNextId(config);
-                Bukkit.getScheduler().runTask(instance, new Runnable() {
-                    @SuppressWarnings("deprecation")
-					@Override
-                    public void run() {
-                        ConfigUtil.loadNpcs(config);
-                        ScoreboardHandler.initScoreboard();
-                        RunicRestartApi.markPluginLoaded("npcs");
-                        Bukkit.getScheduler().scheduleAsyncRepeatingTask(Plugin.this, new Runnable() {
-                            @Override
-                            public void run() {
-                                for (Player player : Bukkit.getOnlinePlayers()) {
-                                    if (NpcHandler.hasLoadedDataForPlayer(player)) {
-                                        NpcHandler.updateNpcsForPlayer(player);
-                                    }
-                                }
-                            }
-                        }, 7 * 20, 7 * 20);
+        Bukkit.getScheduler().runTaskAsynchronously(instance, () -> {
+            config = ConfigUtil.getYamlConfigFile("npcs.yml", instance.getDataFolder());
+            nextId = ConfigUtil.loadNextId(config);
+            Bukkit.getScheduler().runTask(instance, () -> {
+                ConfigUtil.loadNpcs(config);
+                ScoreboardHandler.initScoreboard();
+                RunicRestartApi.markPluginLoaded("npcs");
+                Bukkit.getScheduler().scheduleAsyncRepeatingTask(Plugin.this, () -> {
+                    for (Player player : Bukkit.getOnlinePlayers()) {
+                        if (NpcHandler.hasLoadedDataForPlayer(player)) {
+                            NpcHandler.updateNpcsForPlayer(player);
+                        }
                     }
-                });
-            }
+                }, 7 * 20, 7 * 20);
+            });
         });
     }
 
@@ -86,6 +79,10 @@ public class Plugin extends JavaPlugin {
 
     public static Plugin getInstance() {
         return instance;
+    }
+
+    public static PaperCommandManager getCommandManager() {
+        return commandManager;
     }
 
     public static Integer getNextId() {

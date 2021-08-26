@@ -16,6 +16,19 @@ import java.util.Set;
 
 public class NpcHandler implements Listener {
 
+    /**
+     * Update NPC heads every few seconds to ensure proper rotation
+     */
+    public NpcHandler() {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(Plugin.getInstance(), () -> {
+            for (Player player : LOADED_NPCS.keySet()) {
+                for (Npc npc : LOADED_NPCS.get(player).keySet()) {
+                    npc.rotateHeadForPlayer(player);
+                }
+            }
+        }, 100L, 100L);
+    }
+
     private static final Map<Player, Map<Npc, Boolean>> LOADED_NPCS = new HashMap<>();
 
     private static final MultiWorldGrid<Npc> grid = new MultiWorldGrid<>(new GridBounds(-4096, -4096, 4096, 4096), (short) 32);

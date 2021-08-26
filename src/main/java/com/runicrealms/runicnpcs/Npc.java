@@ -38,7 +38,7 @@ public class Npc {
     private final DataWatcher watcher;
     private final int id;
     private final Hologram hologram;
-    private final Skin skin;
+    private Skin skin;
     private final String uuid;
 
     private boolean shown;
@@ -69,11 +69,15 @@ public class Npc {
         this.shown = shown;
     }
 
+    public void rotateHeadForPlayer(Player player) {
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityHeadRotation(this.entityPlayer, (byte) ((this.location.getYaw() * 256.0F) / 360.0F)));
+    }
+
     public void spawnForPlayer(Player player) {
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, this.entityPlayer));
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutNamedEntitySpawn(this.entityPlayer));
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityMetadata(this.entityPlayer.getId(), this.watcher, true));
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityHeadRotation(this.entityPlayer, (byte) ((this.location.getYaw() * 256.0F) / 360.0F)));
+        rotateHeadForPlayer(player);
     }
 
     public void despawnForPlayer(Player player) {
@@ -115,6 +119,10 @@ public class Npc {
 
     public boolean isShown() {
         return this.shown;
+    }
+
+    public void setSkin(Skin skin) {
+        this.skin = skin;
     }
 
     public void setShown(boolean shown) {
