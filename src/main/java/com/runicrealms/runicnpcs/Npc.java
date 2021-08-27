@@ -63,8 +63,7 @@ public class Npc {
         this.entityPlayer.setNoGravity(true);
         this.entityPlayer.setLocation(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch());
         this.watcher = this.entityPlayer.getDataWatcher();
-        this.watcher.set(new DataWatcherObject<Byte>(16, DataWatcherRegistry.a), (byte) 127);
-        worldServer.addEntity(this.entityPlayer);
+        this.watcher.set(new DataWatcherObject<>(16, DataWatcherRegistry.a), (byte) 127);
         this.hologram = hologram;
         this.shown = shown;
     }
