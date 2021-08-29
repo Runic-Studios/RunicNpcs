@@ -7,7 +7,6 @@ import com.runicrealms.runicnpcs.Npc;
 import com.runicrealms.runicnpcs.NpcHandler;
 import com.runicrealms.runicnpcs.Plugin;
 import com.runicrealms.runicnpcs.Skin;
-import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -41,7 +40,7 @@ public class ConfigUtil {
     }
 
     public static void loadNpcs(FileConfiguration config) {
-        Map<Integer, Npc> npcs = new HashMap<Integer, Npc>();
+        Map<Integer, Npc> npcs = new HashMap<>();
         if (config.contains("npcs")) {
             ConfigurationSection npcsSection = config.getConfigurationSection("npcs");
             for (String key : npcsSection.getKeys(false)) {
@@ -84,55 +83,53 @@ public class ConfigUtil {
             }
         }
         Plugin.setNpcs(npcs);
-        Plugin.setNpcEntityIds(sortNpcsByEntity(npcs));
+        Plugin.setNpcEntityIds(sortNpcsByEntityId(npcs));
         NpcHandler.placeNpcsInGrid(npcs);
         Bukkit.getLogger().log(Level.INFO, "[RunicNpcs] NPCs have been loaded!");
     }
 
-    private static Map<EntityPlayer, Npc> sortNpcsByEntity(Map<Integer, Npc> npcs) {
-        Map<EntityPlayer, Npc> npcEntityIds = new HashMap<EntityPlayer, Npc>();
+    /**
+     * This sorts our list of Npcs by entity id in order to initialize our entity id map
+     *
+     * @param npcs our map of npcs from npc id to npc object
+     * @return our map of npcs from ENTITY id to npc object
+     */
+    private static Map<Integer, Npc> sortNpcsByEntityId(Map<Integer, Npc> npcs) {
+        Map<Integer, Npc> npcEntityIds = new HashMap<>();
         for (Map.Entry<Integer, Npc> entry : npcs.entrySet()) {
-            npcEntityIds.put(entry.getValue().getEntityPlayer(), entry.getValue());
+            npcEntityIds.put(entry.getValue().getEntityId(), entry.getValue());
         }
         return npcEntityIds;
     }
 
     public static void saveNpc(Npc npc, FileConfiguration config) {
-        Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                config.set("npcs." + npc.getId() + ".hologram.world", npc.getHologram().getLocation().getWorld().getName());
-                config.set("npcs." + npc.getId() + ".hologram.x", npc.getHologram().getLocation().getX());
-                config.set("npcs." + npc.getId() + ".hologram.y", npc.getHologram().getLocation().getY());
-                config.set("npcs." + npc.getId() + ".hologram.z", npc.getHologram().getLocation().getZ());
-                config.set("npcs." + npc.getId() + ".hologram.name", ChatColor.stripColor(((TextLine) npc.getHologram().getLine(0)).getText()));
-                config.set("npcs." + npc.getId() + ".hologram.label", ChatColor.stripColor(((TextLine) npc.getHologram().getLine(1)).getText()));
-                config.set("npcs." + npc.getId() + ".location.world", npc.getLocation().getWorld().getName());
-                config.set("npcs." + npc.getId() + ".location.x", npc.getLocation().getX());
-                config.set("npcs." + npc.getId() + ".location.y", npc.getLocation().getY());
-                config.set("npcs." + npc.getId() + ".location.z", npc.getLocation().getZ());
-                config.set("npcs." + npc.getId() + ".location.yaw", npc.getLocation().getYaw());
-                config.set("npcs." + npc.getId() + ".location.pitch", npc.getLocation().getPitch());
-                config.set("npcs." + npc.getId() + ".skin-texture", npc.getSkin().getTexture());
-                config.set("npcs." + npc.getId() + ".skin-signature", npc.getSkin().getSignature());
-                config.set("npcs." + npc.getId() + ".uuid", npc.getUuid());
-                config.set("npcs." + npc.getId() + ".shown", npc.isShown());
-                try {
-                    config.save(new File(Plugin.getInstance().getDataFolder(), "npcs.yml"));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+            config.set("npcs." + npc.getId() + ".hologram.world", npc.getHologram().getLocation().getWorld().getName());
+            config.set("npcs." + npc.getId() + ".hologram.x", npc.getHologram().getLocation().getX());
+            config.set("npcs." + npc.getId() + ".hologram.y", npc.getHologram().getLocation().getY());
+            config.set("npcs." + npc.getId() + ".hologram.z", npc.getHologram().getLocation().getZ());
+            config.set("npcs." + npc.getId() + ".hologram.name", ChatColor.stripColor(((TextLine) npc.getHologram().getLine(0)).getText()));
+            config.set("npcs." + npc.getId() + ".hologram.label", ChatColor.stripColor(((TextLine) npc.getHologram().getLine(1)).getText()));
+            config.set("npcs." + npc.getId() + ".location.world", npc.getLocation().getWorld().getName());
+            config.set("npcs." + npc.getId() + ".location.x", npc.getLocation().getX());
+            config.set("npcs." + npc.getId() + ".location.y", npc.getLocation().getY());
+            config.set("npcs." + npc.getId() + ".location.z", npc.getLocation().getZ());
+            config.set("npcs." + npc.getId() + ".location.yaw", npc.getLocation().getYaw());
+            config.set("npcs." + npc.getId() + ".location.pitch", npc.getLocation().getPitch());
+            config.set("npcs." + npc.getId() + ".skin-texture", npc.getSkin().getTexture());
+            config.set("npcs." + npc.getId() + ".skin-signature", npc.getSkin().getSignature());
+            config.set("npcs." + npc.getId() + ".uuid", npc.getUuid());
+            config.set("npcs." + npc.getId() + ".shown", npc.isShown());
+            try {
+                config.save(new File(Plugin.getInstance().getDataFolder(), "npcs.yml"));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         });
     }
 
     public static void deleteNpc(Integer id, FileConfiguration config) {
-        Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                config.set("npcs." + id, null);
-            }
-        });
+        Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> config.set("npcs." + id, null));
     }
 
     public static Integer loadNextId(FileConfiguration config) {

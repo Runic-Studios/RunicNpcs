@@ -1,36 +1,40 @@
 package com.runicrealms.runicnpcs.event;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.events.ListenerPriority;
+import com.comphenix.protocol.events.PacketAdapter;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.events.PacketEvent;
+import com.runicrealms.runicnpcs.Npc;
 import com.runicrealms.runicnpcs.Plugin;
 import com.runicrealms.runicnpcs.api.NpcClickEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
-import org.bukkit.entity.EntityType;
-import org.bukkit.event.EventHandler;
+import org.bukkit.ChatColor;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityDamageEvent;
-import org.bukkit.event.player.PlayerInteractEntityEvent;
-import org.bukkit.inventory.EquipmentSlot;
 
+/**
+ * Handles the creation of our custom NpcClickEvent
+ */
 public class EventNpcInteract implements Listener {
 
-    @EventHandler
-    public void onDamage(EntityDamageEvent event) {
-        if (event.getEntity().getType() == EntityType.PLAYER) {
-            if (Plugin.getNpcEntities().containsKey(((CraftPlayer) event.getEntity()).getHandle())) {
-                event.setCancelled(true);
-            }
-        }
-    }
-
-    @EventHandler
-    public void onClick(PlayerInteractEntityEvent event) {
-        if (event.getHand().equals(EquipmentSlot.HAND)) {
-            if (event.getRightClicked().getType() == EntityType.PLAYER) {
-                if (Plugin.getNpcEntities().containsKey(((CraftPlayer) event.getRightClicked()).getHandle())) {
-                    Bukkit.getServer().getPluginManager().callEvent(new NpcClickEvent(Plugin.getNpcEntities().get(((CraftPlayer) event.getRightClicked()).getHandle()), event.getPlayer()));
+    public EventNpcInteract() {
+        Plugin.getProtocolManager().addPacketListener(new PacketAdapter(Plugin.getInstance(), ListenerPriority.NORMAL, PacketType.Play.Client.USE_ENTITY) {
+            @Override
+            public void onPacketReceiving(PacketEvent event) {
+                if (event.getPacketType() == PacketType.Play.Client.USE_ENTITY) {
+                    PacketContainer packet = event.getPacket();
+                    int entityID = packet.getIntegers().read(0);
+                    try {
+                        Npc npc = Plugin.getNpcEntities().get(entityID);
+                        Bukkit.getScheduler().scheduleSyncDelayedTask(Plugin.getInstance(),
+                                () -> Bukkit.getServer().getPluginManager().callEvent(new NpcClickEvent(npc, event.getPlayer())));
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+                        Bukkit.getLogger().info(ChatColor.DARK_RED + "An npc could not be found by entity Id!");
+                    }
                 }
             }
-        }
+        });
     }
 
 }

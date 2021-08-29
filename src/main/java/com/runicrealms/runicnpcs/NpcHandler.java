@@ -2,7 +2,6 @@ package com.runicrealms.runicnpcs;
 
 import com.runicrealms.runicnpcs.grid.GridBounds;
 import com.runicrealms.runicnpcs.grid.MultiWorldGrid;
-import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -30,6 +29,10 @@ public class NpcHandler implements Listener {
     }
 
     private static final Map<Player, Map<Npc, Boolean>> LOADED_NPCS = new HashMap<>();
+
+    public static Map<Player, Map<Npc, Boolean>> getLoadedNpcs() {
+        return LOADED_NPCS;
+    }
 
     private static final MultiWorldGrid<Npc> grid = new MultiWorldGrid<>(new GridBounds(-4096, -4096, 4096, 4096), (short) 32);
 
@@ -84,7 +87,7 @@ public class NpcHandler implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Bukkit.getScheduler().runTaskLaterAsynchronously(Plugin.getInstance(), () -> {
             HashMap<Npc, Boolean> npcs = new HashMap<>();
-            for (Map.Entry<EntityPlayer, Npc> entry : Plugin.getNpcEntities().entrySet()) {
+            for (Map.Entry<Integer, Npc> entry : Plugin.getNpcEntities().entrySet()) {
                 npcs.put(entry.getValue(), false);
             }
             LOADED_NPCS.put(event.getPlayer(), npcs);

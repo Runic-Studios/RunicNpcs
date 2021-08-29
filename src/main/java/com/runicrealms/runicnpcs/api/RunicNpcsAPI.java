@@ -12,8 +12,8 @@ import java.util.UUID;
 
 public class RunicNpcsAPI {
 
-    public static boolean isNpc(EntityPlayer player) {
-        return Plugin.getNpcEntities().containsKey(player);
+    public static boolean isNpc(EntityPlayer entityPlayer) {
+        return Plugin.getNpcEntities().containsKey(entityPlayer.getId());
     }
 
     public static Npc getNpcById(Integer id) {
@@ -37,7 +37,7 @@ public class RunicNpcsAPI {
             Npc npc = new Npc(location, skin, id, hologram, finalUuid, shown);
             ConfigUtil.saveNpc(npc, Plugin.getFileConfig());
             Plugin.getNpcs().put(npc.getId(), npc);
-            Plugin.getNpcEntities().put(npc.getEntityPlayer(), npc);
+            Plugin.getNpcEntities().put(npc.getEntityId(), npc);
             NpcHandler.createNpcForPlayers(npc);
             NpcHandler.placeNpcInGrid(npc);
             ScoreboardHandler.addNpcName(npc);
@@ -52,7 +52,7 @@ public class RunicNpcsAPI {
         if (Plugin.getNpcs().containsKey(id)) {
             Npc npc = Plugin.getNpcs().get(id);
             Plugin.getNpcs().remove(id);
-            Plugin.getNpcEntities().remove(npc.getEntityPlayer());
+            Plugin.getNpcEntities().remove(npc.getEntityId());
             NpcHandler.removeNpcForPlayers(npc);
             NpcHandler.removeNpcFromGrid(npc);
             ScoreboardHandler.removeNpcName(npc);

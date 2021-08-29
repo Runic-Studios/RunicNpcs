@@ -1,11 +1,12 @@
 package com.runicrealms.runicnpcs;
 
 import co.aikar.commands.PaperCommandManager;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import com.runicrealms.runicnpcs.command.RunicNpcCommand;
 import com.runicrealms.runicnpcs.config.ConfigUtil;
 import com.runicrealms.runicnpcs.event.EventNpcInteract;
 import com.runicrealms.runicrestart.api.RunicRestartApi;
-import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -19,19 +20,21 @@ public class Plugin extends JavaPlugin {
 
     private static Plugin instance;
 
-    private static Map<Integer, Npc> npcs = new HashMap<>();
-    private static Map<EntityPlayer, Npc> npcEntities = new HashMap<>();
+    private static Map<Integer, Npc> npcs = new HashMap<>(); // maps NPC ids to npcs
+    private static Map<Integer, Npc> npcEntities = new HashMap<>(); // maps ENTITY ids to npcs
     private static FileConfiguration config;
     private static Integer nextId;
     private static PaperCommandManager commandManager;
+    private static ProtocolManager protocolManager;
 
     @Override
     public void onEnable() {
         instance = this;
+        commandManager = new PaperCommandManager(this);
+        protocolManager = ProtocolLibrary.getProtocolManager();
         Bukkit.getPluginManager().registerEvents(new EventNpcInteract(), this);
         Bukkit.getPluginManager().registerEvents(new NpcHandler(), this);
         Bukkit.getPluginManager().registerEvents(new ScoreboardHandler(), this);
-        commandManager = new PaperCommandManager(this);
         commandManager.registerCommand(new RunicNpcCommand());
         if (!this.getDataFolder().exists()) {
             this.getDataFolder().mkdir();
@@ -73,7 +76,7 @@ public class Plugin extends JavaPlugin {
         return npcs;
     }
 
-    public static Map<EntityPlayer, Npc> getNpcEntities() {
+    public static Map<Integer, Npc> getNpcEntities() {
         return npcEntities;
     }
 
@@ -85,6 +88,10 @@ public class Plugin extends JavaPlugin {
         return commandManager;
     }
 
+    public static ProtocolManager getProtocolManager() {
+        return protocolManager;
+    }
+
     public static Integer getNextId() {
         final Integer current = nextId;
         final Integer next = ++nextId;
@@ -92,12 +99,24 @@ public class Plugin extends JavaPlugin {
         return current;
     }
 
+    /**
+     * This initializes our map of NPC IDS to our npc objects.
+     * This is different from our map of ENTITY IDS.
+     *
+     * @param npcs maps our npc ids to our npc objects
+     */
     public static void setNpcs(Map<Integer, Npc> npcs) {
         Plugin.npcs = npcs;
     }
 
-    public static void setNpcEntityIds(Map<EntityPlayer, Npc> npcs) {
-        Plugin.npcEntities = npcs;
+    /**
+     * This initializes our map of ENTITY IDS to our npc objects.
+     * This is different from our map of NPC IDS.
+     *
+     * @param npcEntities maps our entity ids to our npc objects
+     */
+    public static void setNpcEntityIds(Map<Integer, Npc> npcEntities) {
+        Plugin.npcEntities = npcEntities;
     }
 
     public static FileConfiguration getFileConfig() {

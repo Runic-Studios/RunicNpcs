@@ -52,7 +52,7 @@ public class RunicNpcCommand extends BaseCommand {
                     Npc npc = new Npc(npcLocation, skin, id, hologram, finalUuid, true);
                     ConfigUtil.saveNpc(npc, Plugin.getFileConfig());
                     Plugin.getNpcs().put(npc.getId(), npc);
-                    Plugin.getNpcEntities().put(npc.getEntityPlayer(), npc);
+                    Plugin.getNpcEntities().put(npc.getEntityId(), npc);
                     NpcHandler.createNpcForPlayers(npc);
                     NpcHandler.placeNpcInGrid(npc);
                     ScoreboardHandler.addNpcName(npc);
@@ -74,7 +74,7 @@ public class RunicNpcCommand extends BaseCommand {
                 if (Plugin.getNpcs().containsKey(Integer.parseInt(args[0]))) {
                     Npc npc = Plugin.getNpcs().get(Integer.parseInt(args[0]));
                     Plugin.getNpcs().remove(Integer.parseInt(args[0]));
-                    Plugin.getNpcEntities().remove(npc.getEntityPlayer());
+                    Plugin.getNpcEntities().remove(npc.getEntityId());
                     NpcHandler.removeNpcForPlayers(npc);
                     NpcHandler.removeNpcFromGrid(npc);
                     ScoreboardHandler.removeNpcName(npc);
