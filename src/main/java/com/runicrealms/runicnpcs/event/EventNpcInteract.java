@@ -24,14 +24,10 @@ public class EventNpcInteract implements Listener {
                 if (event.getPacketType() == PacketType.Play.Client.USE_ENTITY) {
                     PacketContainer packet = event.getPacket();
                     int entityID = packet.getIntegers().read(0);
-                    try {
-                        Npc npc = Plugin.getNpcEntities().get(entityID);
-                        Bukkit.getScheduler().scheduleSyncDelayedTask(Plugin.getInstance(),
-                                () -> Bukkit.getServer().getPluginManager().callEvent(new NpcClickEvent(npc, event.getPlayer())));
-                    } catch (NullPointerException e) {
-                        e.printStackTrace();
-                        Bukkit.getLogger().info(ChatColor.DARK_RED + "An npc could not be found by entity Id!");
-                    }
+                    Npc npc = Plugin.getNpcEntities().get(entityID);
+                    if (npc == null) return;
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(Plugin.getInstance(),
+                            () -> Bukkit.getServer().getPluginManager().callEvent(new NpcClickEvent(npc, event.getPlayer())));
                 }
             }
         });
