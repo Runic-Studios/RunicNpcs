@@ -166,8 +166,9 @@ public class RunicNpcCommand extends BaseCommand {
 
     private static void sendHelpMessage(CommandSender commandSender) {
         sendMessage(commandSender, "&2/runicnpc create &a<name> <label> <mineskin-id> &r- Creates an NPC, name & label can have underscores to indicate spaces");
-        sendMessage(commandSender, "&2/runicnpc delete &a<npd-id> &r- Deletes an NPC");
+        sendMessage(commandSender, "&2/runicnpc delete &a<npc-id> &r- Deletes an NPC");
         sendMessage(commandSender, "&2/runicnpc id &r- Gives you the NPC ID of the NPC closest to you");
+        sendMessage(commandSender, "&2/runicnpc skin &a<npc-id> <mineskin-id> &r- Updates the skin of the specified npc!");
     }
 
     private static boolean isInt(String number) {
