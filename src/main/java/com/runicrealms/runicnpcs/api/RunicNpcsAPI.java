@@ -24,9 +24,6 @@ public class RunicNpcsAPI {
         Skin skin = MineskinUtil.getMineskinSkin(skinId);
         if (skin != null) {
             String uuid = UUID.randomUUID().toString();
-            while (Plugin.uuidInUse(uuid)) {
-                uuid = UUID.randomUUID().toString();
-            }
             final String finalUuid = new String(uuid);
             Hologram hologram = HologramsAPI.createHologram(Plugin.getInstance(), new Location(location.getWorld(), location.getX(), location.getY() + 2.5, location.getZ()));
             hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + name.replaceAll("_", " ")));

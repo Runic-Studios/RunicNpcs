@@ -12,8 +12,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.IOException;
-import java.net.URL;
 import java.util.*;
 
 public class Plugin extends JavaPlugin {
@@ -121,24 +119,6 @@ public class Plugin extends JavaPlugin {
 
     public static FileConfiguration getFileConfig() {
         return config;
-    }
-
-    public static boolean uuidInUse(String uuid) {
-        String url = "https://api.mojang.com/user/profiles/" + uuid.replace("-", "") + "/names";
-        try {
-            Scanner scanner = new Scanner(new URL(url).openStream(), "UTF-8");
-            Scanner delmitier = scanner.useDelimiter("\\A");
-            if (delmitier.hasNext()) {
-            	delmitier.close();
-            	scanner.close();
-                return true;
-            }
-            delmitier.close();
-            scanner.close();
-        } catch (IOException exception) {
-            exception.printStackTrace();
-        }
-        return false;
     }
 
 }

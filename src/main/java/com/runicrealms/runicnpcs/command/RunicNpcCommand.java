@@ -37,9 +37,6 @@ public class RunicNpcCommand extends BaseCommand {
             Skin skin = MineskinUtil.getMineskinSkin(args[2]);
             if (skin != null) {
                 String uuid = UUID.randomUUID().toString();
-                while (Plugin.uuidInUse(uuid)) {
-                    uuid = UUID.randomUUID().toString();
-                }
                 final String finalUuid = uuid;
                 Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
                     Location npcLocation = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getBlockY(), player.getLocation().getBlockZ() + 0.5, player.getLocation().getYaw(), player.getLocation().getPitch());
