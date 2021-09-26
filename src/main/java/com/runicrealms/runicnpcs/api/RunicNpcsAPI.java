@@ -7,6 +7,7 @@ import com.runicrealms.runicnpcs.config.ConfigUtil;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.entity.Player;
 
 import java.util.UUID;
 
@@ -59,6 +60,11 @@ public class RunicNpcsAPI {
         } else {
             throw new IllegalArgumentException("That NPC ID does not exist!");
         }
+    }
+
+    public static void updateNpcsForPlayer(Player player) {
+        if (!NpcHandler.hasLoadedDataForPlayer(player)) throw new IllegalStateException("Cannot update NPCs before data is loaded for player!");
+        NpcHandler.updateNpcsForPlayer(player);
     }
 
 }
