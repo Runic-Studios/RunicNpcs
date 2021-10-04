@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
 import java.util.Map;
 import java.util.UUID;
 
-@CommandAlias("runicnpc")
+@CommandAlias("runicnpc|npc")
 public class RunicNpcCommand extends BaseCommand {
 
     @Default
@@ -54,7 +54,8 @@ public class RunicNpcCommand extends BaseCommand {
                     NpcHandler.placeNpcInGrid(npc);
                     ScoreboardHandler.addNpcName(npc);
                     Plugin.updateNpcs();
-                    sendMessage(player, "&aCreated NPC. ID is " + id + ", relog to see the text above the NPC.");
+                    ScoreboardHandler.sendScoreboardPackets(player);
+                    sendMessage(player, "&aCreated NPC. ID is " + id + ".");
                 });
             } else {
                 sendMessage(player, "&cSkin invalid.");

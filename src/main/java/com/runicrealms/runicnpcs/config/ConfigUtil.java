@@ -125,7 +125,14 @@ public class ConfigUtil {
     }
 
     public static void deleteNpc(Integer id, FileConfiguration config) {
-        Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> config.set("npcs." + id, null));
+        Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+            config.set("npcs." + id, null);
+            try {
+                config.save(new File(Plugin.getInstance().getDataFolder(), "npcs.yml"));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     public static Integer loadNextId(FileConfiguration config) {

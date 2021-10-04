@@ -86,6 +86,7 @@ public class Npc {
     public void delete() {
         this.hologram.delete();
         this.entityPlayer.die();
+        Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(this::despawnForPlayer));
     }
 
     public Integer getEntityId() {

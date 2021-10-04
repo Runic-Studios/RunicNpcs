@@ -5,6 +5,7 @@ import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.runicrealms.runicnpcs.*;
 import com.runicrealms.runicnpcs.config.ConfigUtil;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -40,6 +41,7 @@ public class RunicNpcsAPI {
             NpcHandler.placeNpcInGrid(npc);
             ScoreboardHandler.addNpcName(npc);
             Plugin.updateNpcs();
+            Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(ScoreboardHandler::sendScoreboardPackets));
             return npc;
         } else {
             throw new IllegalArgumentException("Invalid skin ID!");

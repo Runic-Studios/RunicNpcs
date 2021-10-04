@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.scoreboard.CraftScoreboard;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
@@ -39,10 +40,14 @@ public class ScoreboardHandler implements Listener {
         NPC_NAMES.remove(npc.getEntityPlayer().getName());
     }
 
+    public static void sendScoreboardPackets(Player player) {
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(team, 0));
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(team, NPC_NAMES, 3));
+    }
+
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
-        ((CraftPlayer) event.getPlayer()).getHandle().playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(team, 0));
-        ((CraftPlayer) event.getPlayer()).getHandle().playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(team, NPC_NAMES, 3));
+        sendScoreboardPackets(event.getPlayer());
     }
 
 }
