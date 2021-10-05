@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 import java.util.logging.Level;
 
 public class ConfigUtil {
@@ -61,7 +62,6 @@ public class ConfigUtil {
                     }
                 }
                 hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', color + npcsSection.getString(key + ".hologram.label")));
-                String uuid = npcsSection.getString(key + ".uuid");
                 Npc npc = new Npc(
                         new Location(
                                 Bukkit.getWorld(npcsSection.getString(key + ".location.world")),
@@ -73,7 +73,7 @@ public class ConfigUtil {
                         new Skin(npcsSection.getString(key + ".skin-texture"), npcsSection.getString(key + ".skin-signature")),
                         Integer.parseInt(key),
                         hologram,
-                        uuid,
+                        UUID.randomUUID(),
                         !npcsSection.contains(key + ".shown") || npcsSection.getBoolean(key + ".shown"));
                 npcs.put(Integer.parseInt(key), npc);
             }

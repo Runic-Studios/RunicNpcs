@@ -20,6 +20,7 @@ public class Plugin extends JavaPlugin {
 
     private static Map<Integer, Npc> npcs = new HashMap<>(); // maps NPC ids to npcs
     private static Map<Integer, Npc> npcEntities = new HashMap<>(); // maps ENTITY ids to npcs
+    private static Set<UUID> npcEntityUUIDs = new HashSet<>();
     private static FileConfiguration config;
     private static Integer nextId;
     private static PaperCommandManager commandManager;
@@ -42,6 +43,7 @@ public class Plugin extends JavaPlugin {
             nextId = ConfigUtil.loadNextId(config);
             Bukkit.getScheduler().runTask(instance, () -> {
                 ConfigUtil.loadNpcs(config);
+                for (Npc npc : npcs.values()) npcEntityUUIDs.add(npc.getUuid());
                 ScoreboardHandler.initScoreboard();
                 RunicRestartApi.markPluginLoaded("npcs");
                 Bukkit.getScheduler().scheduleAsyncRepeatingTask(Plugin.this, () -> {
@@ -58,7 +60,7 @@ public class Plugin extends JavaPlugin {
     @Override
     public void onDisable() {
         for (Map.Entry<Integer, Npc> npc : npcs.entrySet()) {
-            npc.getValue().delete();
+            npc.getValue().delete(false);
         }
     }
 
@@ -76,6 +78,10 @@ public class Plugin extends JavaPlugin {
 
     public static Map<Integer, Npc> getNpcEntities() {
         return npcEntities;
+    }
+
+    public static Set<UUID> getNpcEntityUUIDs() {
+        return npcEntityUUIDs;
     }
 
     public static Plugin getInstance() {

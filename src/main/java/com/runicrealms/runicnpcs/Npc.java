@@ -39,15 +39,15 @@ public class Npc {
     private final int id;
     private final Hologram hologram;
     private Skin skin;
-    private final String uuid;
+    private final UUID uuid;
 
     private boolean shown;
 
-    public Npc(Location location, Skin skin, Integer id, Hologram hologram, String uuid, boolean shown) {
+    public Npc(Location location, Skin skin, Integer id, Hologram hologram, UUID uuid, boolean shown) {
         this.id = id;
         this.skin = skin;
         this.uuid = uuid;
-        gameProfile = new GameProfile(UUID.fromString(uuid), "npc_" + id);
+        gameProfile = new GameProfile(uuid, "npc_" + id);
         PropertyMap properties = gameProfile.getProperties();
         if (properties.get("textures").iterator().hasNext()) {
             properties.remove("textures", properties.get("textures").iterator().next());
@@ -83,10 +83,10 @@ public class Npc {
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityDestroy(this.entityPlayer.getId()));
     }
 
-    public void delete() {
+    public void delete(boolean despawn) {
         this.hologram.delete();
         this.entityPlayer.die();
-        Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(this::despawnForPlayer));
+        if (despawn) Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(this::despawnForPlayer));
     }
 
     public Integer getEntityId() {
@@ -109,7 +109,7 @@ public class Npc {
         return this.skin;
     }
 
-    public String getUuid() {
+    public UUID getUuid() {
         return this.uuid;
     }
 

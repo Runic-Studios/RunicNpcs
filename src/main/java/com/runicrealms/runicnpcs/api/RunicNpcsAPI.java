@@ -25,15 +25,13 @@ public class RunicNpcsAPI {
     public static Npc createNpc(Location location, String name, String label, String skinId, boolean shown) { // DON'T RUN ON MAIN THREAD!!!!
         Skin skin = MineskinUtil.getMineskinSkin(skinId);
         if (skin != null) {
-            String uuid = UUID.randomUUID().toString();
-            final String finalUuid = new String(uuid);
             Hologram hologram = HologramsAPI.createHologram(Plugin.getInstance(), new Location(location.getWorld(), location.getX(), location.getY() + 2.5, location.getZ()));
             hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + name.replaceAll("_", " ")));
             hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&',
                     (label.equalsIgnoreCase("Merchant") ? "&a" : (label.equalsIgnoreCase("Quest") ? "&6" : "&7")) +
                             label.replaceAll("_", " ")));
             Integer id = Plugin.getNextId();
-            Npc npc = new Npc(location, skin, id, hologram, finalUuid, shown);
+            Npc npc = new Npc(location, skin, id, hologram, UUID.randomUUID(), shown);
             ConfigUtil.saveNpc(npc, Plugin.getFileConfig());
             Plugin.getNpcs().put(npc.getId(), npc);
             Plugin.getNpcEntities().put(npc.getEntityId(), npc);
@@ -56,7 +54,7 @@ public class RunicNpcsAPI {
             NpcHandler.removeNpcForPlayers(npc);
             NpcHandler.removeNpcFromGrid(npc);
             ScoreboardHandler.removeNpcName(npc);
-            npc.delete();
+            npc.delete(true);
             Plugin.updateNpcs();
             ConfigUtil.deleteNpc(id, Plugin.getFileConfig());
         } else {

@@ -5,7 +5,10 @@ import com.runicrealms.runicnpcs.grid.MultiWorldGrid;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -83,8 +86,16 @@ public class NpcHandler implements Listener {
         }
     }
 
+    @EventHandler(priority = EventPriority.LOW)
+    public void onPreJoin(AsyncPlayerPreLoginEvent event) {
+        if (Plugin.getNpcEntityUUIDs().contains(event.getUniqueId())) {
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "There was an error logging you in\nTry again later! Error: RNPCS_IN_USE");
+        }
+    }
+
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
+
         Bukkit.getScheduler().runTaskLaterAsynchronously(Plugin.getInstance(), () -> {
             HashMap<Npc, Boolean> npcs = new HashMap<>();
             for (Map.Entry<Integer, Npc> entry : Plugin.getNpcEntities().entrySet()) {

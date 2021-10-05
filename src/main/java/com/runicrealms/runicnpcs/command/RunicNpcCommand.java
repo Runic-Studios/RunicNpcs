@@ -36,8 +36,6 @@ public class RunicNpcCommand extends BaseCommand {
         Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
             Skin skin = MineskinUtil.getMineskinSkin(args[2]);
             if (skin != null) {
-                String uuid = UUID.randomUUID().toString();
-                final String finalUuid = uuid;
                 Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
                     Location npcLocation = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getBlockY(), player.getLocation().getBlockZ() + 0.5, player.getLocation().getYaw(), player.getLocation().getPitch());
                     Hologram hologram = HologramsAPI.createHologram(Plugin.getInstance(), new Location(npcLocation.getWorld(), npcLocation.getX(), npcLocation.getY() + 2.5, npcLocation.getZ()));
@@ -46,7 +44,7 @@ public class RunicNpcCommand extends BaseCommand {
                             (args[1].equalsIgnoreCase("Merchant") ? "&a" : (args[1].equalsIgnoreCase("Quest") ? "&6" : "&7")) +
                                     args[1].replaceAll("_", " ")));
                     Integer id = Plugin.getNextId();
-                    Npc npc = new Npc(npcLocation, skin, id, hologram, finalUuid, true);
+                    Npc npc = new Npc(npcLocation, skin, id, hologram, UUID.randomUUID(), true);
                     ConfigUtil.saveNpc(npc, Plugin.getFileConfig());
                     Plugin.getNpcs().put(npc.getId(), npc);
                     Plugin.getNpcEntities().put(npc.getEntityId(), npc);
@@ -76,7 +74,7 @@ public class RunicNpcCommand extends BaseCommand {
                     NpcHandler.removeNpcForPlayers(npc);
                     NpcHandler.removeNpcFromGrid(npc);
                     ScoreboardHandler.removeNpcName(npc);
-                    npc.delete();
+                    npc.delete(true);
                     Plugin.updateNpcs();
                     ConfigUtil.deleteNpc(Integer.parseInt(args[0]), Plugin.getFileConfig());
                     sendMessage(player, "&aSuccessfully removed NPC!");
