@@ -7,8 +7,8 @@ import org.bukkit.event.HandlerList;
 
 public class NpcClickEvent extends Event {
 
-    private Npc npc;
-    private Player player;
+    private final Npc npc;
+    private final Player player;
 
     private static final HandlerList handlers = new HandlerList();
 
