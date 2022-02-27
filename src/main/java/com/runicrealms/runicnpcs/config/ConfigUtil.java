@@ -101,17 +101,19 @@ public class ConfigUtil {
     public static void saveNpc(Npc npc, FileConfiguration config) {
         Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
             config.set("npcs." + npc.getId() + ".hologram.world", npc.getHologram().getLocation().getWorld().getName());
-            config.set("npcs." + npc.getId() + ".hologram.x", npc.getHologram().getLocation().getX());
-            config.set("npcs." + npc.getId() + ".hologram.y", npc.getHologram().getLocation().getY());
-            config.set("npcs." + npc.getId() + ".hologram.z", npc.getHologram().getLocation().getZ());
+            Location location = npc.hasNewLocation() ? npc.getNewLocation() : npc.getLocation();
+            Location hologramLocation = npc.hasNewLocation() ? npc.getNewLocation().clone().add(0, Plugin.HOLOGRAM_VERTICAL_OFFSET, 0) : npc.getHologram().getLocation();
+            config.set("npcs." + npc.getId() + ".hologram.x", hologramLocation.getX());
+            config.set("npcs." + npc.getId() + ".hologram.y", hologramLocation.getY());
+            config.set("npcs." + npc.getId() + ".hologram.z", hologramLocation.getZ());
             config.set("npcs." + npc.getId() + ".hologram.name", ChatColor.stripColor(((TextLine) npc.getHologram().getLine(0)).getText()));
             config.set("npcs." + npc.getId() + ".hologram.label", ChatColor.stripColor(((TextLine) npc.getHologram().getLine(1)).getText()));
-            config.set("npcs." + npc.getId() + ".location.world", npc.getLocation().getWorld().getName());
-            config.set("npcs." + npc.getId() + ".location.x", npc.getLocation().getX());
-            config.set("npcs." + npc.getId() + ".location.y", npc.getLocation().getY());
-            config.set("npcs." + npc.getId() + ".location.z", npc.getLocation().getZ());
-            config.set("npcs." + npc.getId() + ".location.yaw", npc.getLocation().getYaw());
-            config.set("npcs." + npc.getId() + ".location.pitch", npc.getLocation().getPitch());
+            config.set("npcs." + npc.getId() + ".location.world", location.getWorld().getName());
+            config.set("npcs." + npc.getId() + ".location.x", location.getX());
+            config.set("npcs." + npc.getId() + ".location.y", location.getY());
+            config.set("npcs." + npc.getId() + ".location.z", location.getZ());
+            config.set("npcs." + npc.getId() + ".location.yaw", location.getYaw());
+            config.set("npcs." + npc.getId() + ".location.pitch", location.getPitch());
             config.set("npcs." + npc.getId() + ".skin-texture", npc.getSkin().getTexture());
             config.set("npcs." + npc.getId() + ".skin-signature", npc.getSkin().getSignature());
             config.set("npcs." + npc.getId() + ".shown", npc.isShown());

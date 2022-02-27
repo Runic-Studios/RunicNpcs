@@ -37,8 +37,8 @@ public class RunicNpcCommand extends BaseCommand {
             Skin skin = MineskinUtil.getMineskinSkin(args[2]);
             if (skin != null) {
                 Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
-                    Location npcLocation = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getBlockY(), player.getLocation().getBlockZ() + 0.5, player.getLocation().getYaw(), player.getLocation().getPitch());
-                    Hologram hologram = HologramsAPI.createHologram(Plugin.getInstance(), new Location(npcLocation.getWorld(), npcLocation.getX(), npcLocation.getY() + 2.5, npcLocation.getZ()));
+                    Location npcLocation = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getY(), player.getLocation().getBlockZ() + 0.5, player.getLocation().getYaw(), player.getLocation().getPitch());
+                    Hologram hologram = HologramsAPI.createHologram(Plugin.getInstance(), new Location(npcLocation.getWorld(), npcLocation.getX(), npcLocation.getY() + Plugin.HOLOGRAM_VERTICAL_OFFSET, npcLocation.getZ()));
                     hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + args[0].replaceAll("_", " ")));
                     hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&',
                             (args[1].equalsIgnoreCase("Merchant") ? "&a" : (args[1].equalsIgnoreCase("Quest") ? "&6" : "&7")) +
@@ -155,6 +155,21 @@ public class RunicNpcCommand extends BaseCommand {
             sendHelpMessage(player);
         }
     }
+
+    // runicnpc move <npc>
+    @Subcommand("move")
+    @Conditions("is-op")
+    public void onMoveCommand(Player player, String[] args) {
+        if (args.length != 1 || !isInt(args[0])) { sendHelpMessage(player); return; }
+        int npcId = Integer.parseInt(args[0]);
+        Location npcLocation = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getY(), player.getLocation().getBlockZ() + 0.5, player.getLocation().getYaw(), player.getLocation().getPitch());
+        Npc npc = Plugin.getNpcs().get(npcId);
+        if (npc == null) { sendMessage(player, "&cThat is not a valid NPC id!"); return; }
+        npc.setNewLocation(npcLocation);
+        sendMessage(player, "&aNpc has been moved, but it will only change visually after you /rstop because I am lazy.");
+        ConfigUtil.saveNpc(npc, Plugin.getFileConfig());
+    }
+
 
     private static void sendMessage(CommandSender commandSender, String message) {
         commandSender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));

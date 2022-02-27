@@ -1,5 +1,6 @@
 package com.runicrealms.runicnpcs;
 
+import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.PaperCommandManager;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -15,6 +16,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.*;
 
 public class Plugin extends JavaPlugin {
+
+    public static double HOLOGRAM_VERTICAL_OFFSET = 2.5; // Blocks
 
     private static Plugin instance;
 
@@ -35,6 +38,10 @@ public class Plugin extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new NpcHandler(), this);
         Bukkit.getPluginManager().registerEvents(new ScoreboardHandler(), this);
         commandManager.registerCommand(new RunicNpcCommand());
+        commandManager.getCommandConditions().addCondition("is-op", (context) -> {
+            if (!context.getIssuer().getIssuer().isOp())
+                throw new ConditionFailedException("You must be an operator to run this command!");
+        });
         if (!this.getDataFolder().exists()) {
             this.getDataFolder().mkdir();
         }

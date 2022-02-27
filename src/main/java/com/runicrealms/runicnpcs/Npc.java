@@ -41,6 +41,8 @@ public class Npc {
     private Skin skin;
     private final UUID uuid;
 
+    private Location newLocation = null; // Changes when we move an NPC to be saved on restart
+
     private boolean shown;
 
     public Npc(Location location, Skin skin, Integer id, Hologram hologram, UUID uuid, boolean shown) {
@@ -128,6 +130,18 @@ public class Npc {
     public void setShown(boolean shown) {
         this.shown = shown;
         Plugin.updateNpcs();
+    }
+
+    public Location getNewLocation() {
+        return this.newLocation;
+    }
+
+    public boolean hasNewLocation() {
+        return this.newLocation != null;
+    }
+
+    public void setNewLocation(Location newLocation) { // Will only take effect after restart
+        this.newLocation = newLocation;
     }
 
 }

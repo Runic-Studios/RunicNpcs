@@ -25,7 +25,7 @@ public class RunicNpcsAPI {
     public static Npc createNpc(Location location, String name, String label, String skinId, boolean shown) { // DON'T RUN ON MAIN THREAD!!!!
         Skin skin = MineskinUtil.getMineskinSkin(skinId);
         if (skin != null) {
-            Hologram hologram = HologramsAPI.createHologram(Plugin.getInstance(), new Location(location.getWorld(), location.getX(), location.getY() + 2.5, location.getZ()));
+            Hologram hologram = HologramsAPI.createHologram(Plugin.getInstance(), new Location(location.getWorld(), location.getX(), location.getY() + Plugin.HOLOGRAM_VERTICAL_OFFSET, location.getZ()));
             hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + name.replaceAll("_", " ")));
             hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&',
                     (label.equalsIgnoreCase("Merchant") ? "&a" : (label.equalsIgnoreCase("Quest") ? "&6" : "&7")) +
