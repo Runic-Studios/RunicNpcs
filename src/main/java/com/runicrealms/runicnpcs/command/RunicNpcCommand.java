@@ -148,7 +148,7 @@ public class RunicNpcCommand extends BaseCommand {
                         sendMessage(player, "&aNPC skin updated! Updated skin will be visible upon next rstop.");
                     });
                 } else {
-                    sendMessage(player, "&cSkin invalid.");
+                    sendMessage(player, "&cSkin invalid. Did you copy the end of the MineSkin URL?");
                 }
             });
         } else {
