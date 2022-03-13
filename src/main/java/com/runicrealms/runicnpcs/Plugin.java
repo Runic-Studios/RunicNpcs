@@ -59,7 +59,7 @@ public class Plugin extends JavaPlugin {
                             NpcHandler.updateNpcsForPlayer(player);
                         }
                     }
-                }, 7 * 20, 7 * 20);
+                }, 4 * 20, 4 * 20);
             });
         });
     }
