@@ -1,5 +1,6 @@
 package com.runicrealms.runicnpcs;
 
+import com.runicrealms.plugin.character.api.CharacterSelectEvent;
 import com.runicrealms.runicnpcs.grid.GridBounds;
 import com.runicrealms.runicnpcs.grid.MultiWorldGrid;
 import org.bukkit.Bukkit;
@@ -8,8 +9,6 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
@@ -93,9 +92,8 @@ public class NpcHandler implements Listener {
         }
     }
 
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-
+    @EventHandler(priority = EventPriority.HIGHEST) // runs late
+    public void onCharacterSelect(CharacterSelectEvent event) {
         Bukkit.getScheduler().runTaskLaterAsynchronously(Plugin.getInstance(), () -> {
             HashMap<Npc, Boolean> npcs = new HashMap<>();
             for (Map.Entry<Integer, Npc> entry : Plugin.getNpcEntities().entrySet()) {

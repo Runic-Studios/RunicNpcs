@@ -126,6 +126,14 @@
 			<version>2.4.0</version>
 			<scope>provided</scope>
 		</dependency>
+		<!-- RunicCore -->
+		<dependency>
+			<groupId>com.runicrealms.plugin</groupId>
+			<artifactId>RunicCore</artifactId>
+			<version>1.16.4</version>
+			<scope>system</scope>
+			<systemPath>${project.basedir}/../lib/RunicCore-1.16.4.jar</systemPath>
+		</dependency>
 		<!-- RunicRestart -->
 		<dependency>
 			<groupId>com.runicrealms.runicrestart.Plugin</groupId>
