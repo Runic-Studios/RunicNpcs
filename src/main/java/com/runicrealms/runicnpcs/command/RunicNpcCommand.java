@@ -2,13 +2,14 @@ package com.runicrealms.runicnpcs.command;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
-
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.runicrealms.runicnpcs.*;
 import com.runicrealms.runicnpcs.config.ConfigUtil;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -156,15 +157,44 @@ public class RunicNpcCommand extends BaseCommand {
         }
     }
 
+    // runicnpc rename <npc> <name>
+    @Subcommand("rename")
+    @Conditions("is-op")
+    public void onRenameCommand(Player player, String[] args) {
+        if (args.length == 2) {
+            Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+                if (args[1] != null) {
+                    String name = args[1].replaceAll("_", " ");
+                    Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> {
+                        Npc npc = Plugin.getNpcs().get(Integer.valueOf(args[0]));
+                        npc.setName(name);
+                        ConfigUtil.saveNpc(npc, Plugin.getFileConfig());
+                        sendMessage(player, "&aNPC name updated! Name color will update on next rstop.");
+                    });
+                } else {
+                    sendMessage(player, "&cCommand returned invalid.");
+                }
+            });
+        } else {
+            sendHelpMessage(player);
+        }
+    }
+
     // runicnpc move <npc>
     @Subcommand("move")
     @Conditions("is-op")
     public void onMoveCommand(Player player, String[] args) {
-        if (args.length != 1 || !isInt(args[0])) { sendHelpMessage(player); return; }
+        if (args.length != 1 || !isInt(args[0])) {
+            sendHelpMessage(player);
+            return;
+        }
         int npcId = Integer.parseInt(args[0]);
         Location npcLocation = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getY(), player.getLocation().getBlockZ() + 0.5, player.getLocation().getYaw(), player.getLocation().getPitch());
         Npc npc = Plugin.getNpcs().get(npcId);
-        if (npc == null) { sendMessage(player, "&cThat is not a valid NPC id!"); return; }
+        if (npc == null) {
+            sendMessage(player, "&cThat is not a valid NPC id!");
+            return;
+        }
         npc.setNewLocation(npcLocation);
         sendMessage(player, "&aNpc has been moved, but it will only change visually after you /rstop because I am lazy.");
         ConfigUtil.saveNpc(npc, Plugin.getFileConfig());
@@ -180,6 +210,7 @@ public class RunicNpcCommand extends BaseCommand {
         sendMessage(commandSender, "&2/runicnpc delete &a<npc-id> &r- Deletes an NPC");
         sendMessage(commandSender, "&2/runicnpc id &r- Gives you the NPC ID of the NPC closest to you");
         sendMessage(commandSender, "&2/runicnpc skin &a<npc-id> <mineskin-id> &r- Updates the skin of the specified npc!");
+        sendMessage(commandSender, "&2/runicnpc rename &a<npc-id> <name> &r- Updates the name of the specified npc! Use underscores for spaces.");
     }
 
     private static boolean isInt(String number) {

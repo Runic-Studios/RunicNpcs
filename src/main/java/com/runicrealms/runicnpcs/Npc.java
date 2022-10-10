@@ -4,21 +4,7 @@ import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import com.mojang.authlib.properties.PropertyMap;
-import net.minecraft.server.v1_16_R3.DataWatcher;
-import net.minecraft.server.v1_16_R3.DataWatcherObject;
-import net.minecraft.server.v1_16_R3.DataWatcherRegistry;
-import net.minecraft.server.v1_16_R3.EntityPlayer;
-import net.minecraft.server.v1_16_R3.EnumProtocolDirection;
-import net.minecraft.server.v1_16_R3.MinecraftServer;
-import net.minecraft.server.v1_16_R3.NetworkManager;
-import net.minecraft.server.v1_16_R3.PacketPlayOutEntityDestroy;
-import net.minecraft.server.v1_16_R3.PacketPlayOutEntityHeadRotation;
-import net.minecraft.server.v1_16_R3.PacketPlayOutEntityMetadata;
-import net.minecraft.server.v1_16_R3.PacketPlayOutNamedEntitySpawn;
-import net.minecraft.server.v1_16_R3.PacketPlayOutPlayerInfo;
-import net.minecraft.server.v1_16_R3.PlayerConnection;
-import net.minecraft.server.v1_16_R3.PlayerInteractManager;
-import net.minecraft.server.v1_16_R3.WorldServer;
+import net.minecraft.server.v1_16_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
@@ -88,7 +74,8 @@ public class Npc {
     public void delete(boolean despawn) {
         this.hologram.delete();
         this.entityPlayer.die();
-        if (despawn) Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(this::despawnForPlayer));
+        if (despawn)
+            Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(this::despawnForPlayer));
     }
 
     public Integer getEntityId() {
@@ -101,6 +88,17 @@ public class Npc {
 
     public Hologram getHologram() {
         return this.hologram;
+    }
+
+    public String getName() {
+        return this.hologram.getLine(0).toString();
+    }
+
+    /**
+     * @return the label of the Npc "Merchant," "Quest," etc.
+     */
+    public String getLabel() {
+        return this.hologram.getLine(1).toString();
     }
 
     public Location getLocation() {
@@ -121,6 +119,16 @@ public class Npc {
 
     public boolean isShown() {
         return this.shown;
+    }
+
+    public void setName(String name) {
+        this.hologram.getLine(0).removeLine();
+        this.hologram.insertTextLine(0, name);
+    }
+
+    public void setLabel(String label) {
+        this.hologram.getLine(1).removeLine();
+        this.hologram.insertTextLine(1, label);
     }
 
     public void setSkin(Skin skin) {

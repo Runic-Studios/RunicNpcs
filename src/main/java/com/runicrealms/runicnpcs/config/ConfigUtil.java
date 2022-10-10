@@ -98,6 +98,12 @@ public class ConfigUtil {
         return npcEntityIds;
     }
 
+    /**
+     * Saves a Npc to file storage. Name and label of hologram are set to hologram lines 0 and 1, respectively
+     *
+     * @param npc    to save
+     * @param config the section of the file config
+     */
     public static void saveNpc(Npc npc, FileConfiguration config) {
         Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
             config.set("npcs." + npc.getId() + ".hologram.world", npc.getHologram().getLocation().getWorld().getName());
