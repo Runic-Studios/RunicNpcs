@@ -1,9 +1,17 @@
 package com.runicrealms.runicnpcs;
 
+import com.gmail.filoghost.holographicdisplays.api.Hologram;
+import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.runicrealms.plugin.character.api.CharacterSelectEvent;
+import com.runicrealms.runicnpcs.api.RunicNpcsAPI;
+import com.runicrealms.runicnpcs.config.ConfigUtil;
 import com.runicrealms.runicnpcs.grid.GridBounds;
 import com.runicrealms.runicnpcs.grid.MultiWorldGrid;
+import com.runicrealms.runicnpcs.listener.ScoreboardHandler;
+import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -14,14 +22,18 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
-public class NpcHandler implements Listener {
+public class NpcHandler implements Listener, RunicNpcsAPI {
+
+    private static final Map<Player, Map<Npc, Boolean>> LOADED_NPCS = new HashMap<>();
+    private static final MultiWorldGrid<Npc> grid = new MultiWorldGrid<>(new GridBounds(-4096, -4096, 4096, 4096), (short) 32);
 
     /**
      * Update NPC heads every few seconds to ensure proper rotation
      */
     public NpcHandler() {
-        Bukkit.getScheduler().runTaskTimerAsynchronously(Plugin.getInstance(), () -> {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(RunicNpcs.getInstance(), () -> {
             for (Player player : LOADED_NPCS.keySet()) {
                 for (Npc npc : LOADED_NPCS.get(player).keySet()) {
                     npc.rotateHeadForPlayer(player);
@@ -30,21 +42,95 @@ public class NpcHandler implements Listener {
         }, 100L, 100L);
     }
 
-    private static final Map<Player, Map<Npc, Boolean>> LOADED_NPCS = new HashMap<>();
+    @Override
+    public Npc createNpc(Location location, String name, String label, String skinId, boolean shown) {
+        Skin skin = MineskinUtil.getMineskinSkin(skinId);
+        if (skin != null) {
+            Hologram hologram = HologramsAPI.createHologram(RunicNpcs.getInstance(), new Location(location.getWorld(), location.getX(), location.getY() + RunicNpcs.HOLOGRAM_VERTICAL_OFFSET, location.getZ()));
+            hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + name.replaceAll("_", " ")));
+            hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&',
+                    (label.equalsIgnoreCase("Merchant") ? "&a" : (label.equalsIgnoreCase("Quest") ? "&6" : "&7")) +
+                            label.replaceAll("_", " ")));
+            Integer id = RunicNpcs.getNextId();
+            Npc npc = new Npc(location, skin, id, hologram, UUID.randomUUID(), shown);
+            ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
+            RunicNpcs.getNpcs().put(npc.getId(), npc);
+            RunicNpcs.getNpcEntities().put(npc.getEntityId(), npc);
+            this.createNpcForPlayers(npc);
+            this.placeNpcInGrid(npc);
+            ScoreboardHandler.addNpcName(npc);
+            RunicNpcs.updateNpcs();
+            Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(ScoreboardHandler::sendScoreboardPackets));
+            return npc;
+        } else {
+            throw new IllegalArgumentException("Invalid skin ID!");
+        }
+    }
 
-    public static Map<Player, Map<Npc, Boolean>> getLoadedNpcs() {
+    public void createNpcForPlayers(Npc npc) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            LOADED_NPCS.get(player).put(npc, false);
+        }
+    }
+
+    @Override
+    public void deleteNpc(Integer id) {
+        if (RunicNpcs.getNpcs().containsKey(id)) {
+            Npc npc = RunicNpcs.getNpcs().get(id);
+            RunicNpcs.getNpcs().remove(id);
+            RunicNpcs.getNpcEntities().remove(npc.getEntityId());
+            this.removeNpcForPlayers(npc);
+            this.removeNpcFromGrid(npc);
+            ScoreboardHandler.removeNpcName(npc);
+            npc.delete(true);
+            RunicNpcs.updateNpcs();
+            ConfigUtil.deleteNpc(id, RunicNpcs.getFileConfig());
+        } else {
+            throw new IllegalArgumentException("That NPC ID does not exist!");
+        }
+    }
+
+    @Override
+    public Map<Player, Map<Npc, Boolean>> getLoadedNpcs() {
         return LOADED_NPCS;
     }
 
-    private static final MultiWorldGrid<Npc> grid = new MultiWorldGrid<>(new GridBounds(-4096, -4096, 4096, 4096), (short) 32);
+    @Override
+    public Npc getNpcById(Integer id) {
+        return RunicNpcs.getNpcs().get(id);
+    }
 
-    public static void placeNpcsInGrid(Map<Integer, Npc> npcs) {
+    @Override
+    public boolean hasLoadedDataForPlayer(Player player) {
+        return LOADED_NPCS.containsKey(player);
+    }
+
+    @Override
+    public boolean isNpc(EntityPlayer entityPlayer) {
+        return RunicNpcs.getNpcEntities().containsKey(entityPlayer.getId());
+    }
+
+    @Override
+    public void placeNpcInGrid(Npc npc) {
+        grid.insertElement(npc.getLocation(), npc);
+    }
+
+    @Override
+    public void placeNpcsInGrid(Map<Integer, Npc> npcs) {
         for (Map.Entry<Integer, Npc> entry : npcs.entrySet()) {
             grid.insertElement(entry.getValue().getLocation(), entry.getValue());
         }
     }
 
-    public static void removeNpcFromGrid(Npc npc) {
+    @Override
+    public void removeNpcForPlayers(Npc npc) {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            LOADED_NPCS.get(player).remove(npc);
+        }
+    }
+
+    @Override
+    public void removeNpcFromGrid(Npc npc) {
         if (grid.containsElementInGrid(npc.getLocation(), npc)) {
             grid.removeElement(npc.getLocation(), npc);
             return;
@@ -52,23 +138,10 @@ public class NpcHandler implements Listener {
         throw new IllegalArgumentException("Npc not in grid!");
     }
 
-    public static void createNpcForPlayers(Npc npc) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            LOADED_NPCS.get(player).put(npc, false);
-        }
-    }
-
-    public static void removeNpcForPlayers(Npc npc) {
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            LOADED_NPCS.get(player).remove(npc);
-        }
-    }
-
-    public static void placeNpcInGrid(Npc npc) {
-        grid.insertElement(npc.getLocation(), npc);
-    }
-
-    public static void updateNpcsForPlayer(Player player) {
+    @Override
+    public void updateNpcsForPlayer(Player player) {
+        if (!hasLoadedDataForPlayer(player))
+            throw new IllegalStateException("Cannot update NPCs before data is loaded for player!");
         Set<Npc> surrounding = grid.getSurroundingElements(player.getLocation(), (short) 2);
         for (Map.Entry<Npc, Boolean> entry : LOADED_NPCS.get(player).entrySet()) {
             if (entry.getValue()) {
@@ -85,36 +158,26 @@ public class NpcHandler implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOW)
-    public void onPreJoin(AsyncPlayerPreLoginEvent event) {
-        if (Plugin.getNpcEntityUUIDs().contains(event.getUniqueId())) {
-            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "There was an error logging you in\nTry again later! Error: RNPCS_IN_USE");
-        }
-    }
-
     @EventHandler(priority = EventPriority.HIGHEST) // runs late
     public void onCharacterSelect(CharacterSelectEvent event) {
-        Bukkit.getScheduler().runTaskLaterAsynchronously(Plugin.getInstance(), () -> {
-            HashMap<Npc, Boolean> npcs = new HashMap<>();
-            for (Map.Entry<Integer, Npc> entry : Plugin.getNpcEntities().entrySet()) {
-                npcs.put(entry.getValue(), false);
-            }
-            LOADED_NPCS.put(event.getPlayer(), npcs);
-            updateNpcsForPlayer(event.getPlayer());
-        }, 1);
+        HashMap<Npc, Boolean> npcs = new HashMap<>();
+        for (Map.Entry<Integer, Npc> entry : RunicNpcs.getNpcEntities().entrySet()) {
+            npcs.put(entry.getValue(), false);
+        }
+        LOADED_NPCS.put(event.getPlayer(), npcs);
+        updateNpcsForPlayer(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.LOW)
+    public void onPreJoin(AsyncPlayerPreLoginEvent event) {
+        if (RunicNpcs.getNpcEntityUUIDs().contains(event.getUniqueId())) {
+            event.disallow(AsyncPlayerPreLoginEvent.Result.KICK_OTHER, "There was an error logging you in\nTry again later! Error: RNPCS_IN_USE");
+        }
     }
 
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         LOADED_NPCS.remove(event.getPlayer());
-    }
-
-    public static boolean hasLoadedDataForPlayer(Player player) {
-        return LOADED_NPCS.containsKey(player);
-    }
-
-    public static MultiWorldGrid<Npc> getNpcGrid() {
-        return grid;
     }
 
 }

@@ -4,8 +4,7 @@ import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.runicrealms.runicnpcs.Npc;
-import com.runicrealms.runicnpcs.NpcHandler;
-import com.runicrealms.runicnpcs.Plugin;
+import com.runicrealms.runicnpcs.RunicNpcs;
 import com.runicrealms.runicnpcs.Skin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -44,7 +43,7 @@ public class ConfigUtil {
         if (config.contains("npcs")) {
             ConfigurationSection npcsSection = config.getConfigurationSection("npcs");
             for (String key : npcsSection.getKeys(false)) {
-                Hologram hologram = HologramsAPI.createHologram(Plugin.getInstance(), new Location(
+                Hologram hologram = HologramsAPI.createHologram(RunicNpcs.getInstance(), new Location(
                         Bukkit.getWorld(npcsSection.getString(key + ".hologram.world")),
                         Double.parseDouble(npcsSection.getString(key + ".hologram.x")),
                         Double.parseDouble(npcsSection.getString(key + ".hologram.y")),
@@ -78,9 +77,9 @@ public class ConfigUtil {
                 npcs.put(Integer.parseInt(key), npc);
             }
         }
-        Plugin.setNpcs(npcs);
-        Plugin.setNpcEntityIds(sortNpcsByEntityId(npcs));
-        NpcHandler.placeNpcsInGrid(npcs);
+        RunicNpcs.setNpcs(npcs);
+        RunicNpcs.setNpcEntityIds(sortNpcsByEntityId(npcs));
+        RunicNpcs.getAPI().placeNpcsInGrid(npcs);
         Bukkit.getLogger().log(Level.INFO, "[RunicNpcs] NPCs have been loaded!");
     }
 
@@ -105,10 +104,10 @@ public class ConfigUtil {
      * @param config the section of the file config
      */
     public static void saveNpc(Npc npc, FileConfiguration config) {
-        Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
             config.set("npcs." + npc.getId() + ".hologram.world", npc.getHologram().getLocation().getWorld().getName());
             Location location = npc.hasNewLocation() ? npc.getNewLocation() : npc.getLocation();
-            Location hologramLocation = npc.hasNewLocation() ? npc.getNewLocation().clone().add(0, Plugin.HOLOGRAM_VERTICAL_OFFSET, 0) : npc.getHologram().getLocation();
+            Location hologramLocation = npc.hasNewLocation() ? npc.getNewLocation().clone().add(0, RunicNpcs.HOLOGRAM_VERTICAL_OFFSET, 0) : npc.getHologram().getLocation();
             config.set("npcs." + npc.getId() + ".hologram.x", hologramLocation.getX());
             config.set("npcs." + npc.getId() + ".hologram.y", hologramLocation.getY());
             config.set("npcs." + npc.getId() + ".hologram.z", hologramLocation.getZ());
@@ -124,7 +123,7 @@ public class ConfigUtil {
             config.set("npcs." + npc.getId() + ".skin-signature", npc.getSkin().getSignature());
             config.set("npcs." + npc.getId() + ".shown", npc.isShown());
             try {
-                config.save(new File(Plugin.getInstance().getDataFolder(), "npcs.yml"));
+                config.save(new File(RunicNpcs.getInstance().getDataFolder(), "npcs.yml"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -132,10 +131,10 @@ public class ConfigUtil {
     }
 
     public static void deleteNpc(Integer id, FileConfiguration config) {
-        Bukkit.getScheduler().runTaskAsynchronously(Plugin.getInstance(), () -> {
+        Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
             config.set("npcs." + id, null);
             try {
-                config.save(new File(Plugin.getInstance().getDataFolder(), "npcs.yml"));
+                config.save(new File(RunicNpcs.getInstance().getDataFolder(), "npcs.yml"));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -148,7 +147,7 @@ public class ConfigUtil {
         } else {
             config.set("next-id", 0);
             try {
-                config.save(new File(Plugin.getInstance().getDataFolder(), "npcs.yml"));
+                config.save(new File(RunicNpcs.getInstance().getDataFolder(), "npcs.yml"));
             } catch (IOException e) {
                 e.printStackTrace();
             }

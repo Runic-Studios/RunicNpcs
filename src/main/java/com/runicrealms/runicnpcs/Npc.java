@@ -18,15 +18,14 @@ import java.util.UUID;
 @SuppressWarnings("FieldCanBeLocal")
 public class Npc {
 
-    public EntityPlayer entityPlayer;
     private final GameProfile gameProfile;
     private final Location location;
     private final DataWatcher watcher;
     private final int id;
     private final Hologram hologram;
-    private Skin skin;
     private final UUID uuid;
-
+    public EntityPlayer entityPlayer;
+    private Skin skin;
     private Location newLocation = null; // Changes when we move an NPC to be saved on restart
 
     private boolean shown;
@@ -47,13 +46,98 @@ public class Npc {
         this.entityPlayer = new EntityPlayer(minecraftServer, worldServer, this.gameProfile, new PlayerInteractManager(worldServer));
         this.entityPlayer.playerConnection = new PlayerConnection(minecraftServer, new NetworkManager(EnumProtocolDirection.CLIENTBOUND), this.entityPlayer);
         this.entityPlayer.setHealth(1f);
-        this.entityPlayer.getBukkitEntity().setMetadata("NPC", new FixedMetadataValue(Plugin.getInstance(), true));
+        this.entityPlayer.getBukkitEntity().setMetadata("NPC", new FixedMetadataValue(RunicNpcs.getInstance(), true));
         this.entityPlayer.setNoGravity(true);
         this.entityPlayer.setLocation(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch());
         this.watcher = this.entityPlayer.getDataWatcher();
         this.watcher.set(new DataWatcherObject<>(16, DataWatcherRegistry.a), (byte) 127);
         this.hologram = hologram;
         this.shown = shown;
+    }
+
+    public void delete(boolean despawn) {
+        this.hologram.delete();
+        this.entityPlayer.die();
+        if (despawn)
+            Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(this::despawnForPlayer));
+    }
+
+    public void despawnForPlayer(Player player) {
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityDestroy(this.entityPlayer.getId()));
+    }
+
+    public Integer getEntityId() {
+        return this.entityPlayer.getId();
+    }
+
+    public EntityPlayer getEntityPlayer() {
+        return this.entityPlayer;
+    }
+
+    public Hologram getHologram() {
+        return this.hologram;
+    }
+
+    public int getId() {
+        return this.id;
+    }
+
+    /**
+     * @return the label of the Npc "Merchant," "Quest," etc.
+     */
+    public String getLabel() {
+        return this.hologram.getLine(1).toString();
+    }
+
+    public void setLabel(String label) {
+        this.hologram.getLine(1).removeLine();
+        this.hologram.insertTextLine(1, label);
+    }
+
+    public Location getLocation() {
+        return this.location;
+    }
+
+    public String getName() {
+        return this.hologram.getLine(0).toString();
+    }
+
+    public void setName(String name) {
+        this.hologram.getLine(0).removeLine();
+        this.hologram.insertTextLine(0, name);
+    }
+
+    public Location getNewLocation() {
+        return this.newLocation;
+    }
+
+    public void setNewLocation(Location newLocation) { // Will only take effect after restart
+        this.newLocation = newLocation;
+    }
+
+    public Skin getSkin() {
+        return this.skin;
+    }
+
+    public void setSkin(Skin skin) {
+        this.skin = skin;
+    }
+
+    public UUID getUuid() {
+        return this.uuid;
+    }
+
+    public boolean hasNewLocation() {
+        return this.newLocation != null;
+    }
+
+    public boolean isShown() {
+        return this.shown;
+    }
+
+    public void setShown(boolean shown) {
+        this.shown = shown;
+        RunicNpcs.updateNpcs();
     }
 
     public void rotateHeadForPlayer(Player player) {
@@ -65,91 +149,6 @@ public class Npc {
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutNamedEntitySpawn(this.entityPlayer));
         ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityMetadata(this.entityPlayer.getId(), this.watcher, true));
         rotateHeadForPlayer(player);
-    }
-
-    public void despawnForPlayer(Player player) {
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityDestroy(this.entityPlayer.getId()));
-    }
-
-    public void delete(boolean despawn) {
-        this.hologram.delete();
-        this.entityPlayer.die();
-        if (despawn)
-            Bukkit.getScheduler().runTask(Plugin.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(this::despawnForPlayer));
-    }
-
-    public Integer getEntityId() {
-        return this.entityPlayer.getId();
-    }
-
-    public int getId() {
-        return this.id;
-    }
-
-    public Hologram getHologram() {
-        return this.hologram;
-    }
-
-    public String getName() {
-        return this.hologram.getLine(0).toString();
-    }
-
-    /**
-     * @return the label of the Npc "Merchant," "Quest," etc.
-     */
-    public String getLabel() {
-        return this.hologram.getLine(1).toString();
-    }
-
-    public Location getLocation() {
-        return this.location;
-    }
-
-    public Skin getSkin() {
-        return this.skin;
-    }
-
-    public UUID getUuid() {
-        return this.uuid;
-    }
-
-    public EntityPlayer getEntityPlayer() {
-        return this.entityPlayer;
-    }
-
-    public boolean isShown() {
-        return this.shown;
-    }
-
-    public void setName(String name) {
-        this.hologram.getLine(0).removeLine();
-        this.hologram.insertTextLine(0, name);
-    }
-
-    public void setLabel(String label) {
-        this.hologram.getLine(1).removeLine();
-        this.hologram.insertTextLine(1, label);
-    }
-
-    public void setSkin(Skin skin) {
-        this.skin = skin;
-    }
-
-    public void setShown(boolean shown) {
-        this.shown = shown;
-        Plugin.updateNpcs();
-    }
-
-    public Location getNewLocation() {
-        return this.newLocation;
-    }
-
-    public boolean hasNewLocation() {
-        return this.newLocation != null;
-    }
-
-    public void setNewLocation(Location newLocation) { // Will only take effect after restart
-        this.newLocation = newLocation;
     }
 
 }

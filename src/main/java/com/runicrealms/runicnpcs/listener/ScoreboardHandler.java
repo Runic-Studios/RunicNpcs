@@ -1,11 +1,12 @@
-package com.runicrealms.runicnpcs;
+package com.runicrealms.runicnpcs.listener;
 
 
+import com.runicrealms.runicnpcs.Npc;
+import com.runicrealms.runicnpcs.RunicNpcs;
 import net.minecraft.server.v1_16_R3.PacketPlayOutScoreboardTeam;
 import net.minecraft.server.v1_16_R3.ScoreboardTeam;
 import net.minecraft.server.v1_16_R3.ScoreboardTeamBase;
 import org.bukkit.Bukkit;
-
 import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_16_R3.scoreboard.CraftScoreboard;
 import org.bukkit.entity.Player;
@@ -24,7 +25,7 @@ public class ScoreboardHandler implements Listener {
     private static ScoreboardTeam team;
 
     public static void initScoreboard() {
-        for (Map.Entry<Integer, Npc> entry : Plugin.getNpcs().entrySet()) {
+        for (Map.Entry<Integer, Npc> entry : RunicNpcs.getNpcs().entrySet()) {
             NPC_NAMES.add(entry.getValue().getEntityPlayer().getName());
         }
         Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
