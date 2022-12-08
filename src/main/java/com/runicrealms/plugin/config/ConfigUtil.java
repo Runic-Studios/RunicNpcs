@@ -1,11 +1,11 @@
-package com.runicrealms.runicnpcs.config;
+package com.runicrealms.plugin.config;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
-import com.runicrealms.runicnpcs.Npc;
-import com.runicrealms.runicnpcs.RunicNpcs;
-import com.runicrealms.runicnpcs.Skin;
+import com.runicrealms.plugin.Npc;
+import com.runicrealms.plugin.RunicNpcs;
+import com.runicrealms.plugin.Skin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;

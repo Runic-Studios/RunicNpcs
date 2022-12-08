@@ -1,4 +1,4 @@
-package com.runicrealms.runicnpcs;
+package com.runicrealms.plugin;
 
 public class Skin {
 
@@ -10,12 +10,12 @@ public class Skin {
         this.signature = signature;
     }
 
-    public String getTexture() {
-        return this.texture;
-    }
-
     public String getSignature() {
         return this.signature;
+    }
+
+    public String getTexture() {
+        return this.texture;
     }
 
 }

@@ -1,4 +1,4 @@
-package com.runicrealms.runicnpcs;
+package com.runicrealms.plugin;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.mojang.authlib.GameProfile;

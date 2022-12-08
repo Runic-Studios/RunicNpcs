@@ -1,14 +1,14 @@
-package com.runicrealms.runicnpcs;
+package com.runicrealms.plugin;
 
 import co.aikar.commands.ConditionFailedException;
 import co.aikar.commands.PaperCommandManager;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import com.runicrealms.runicnpcs.api.RunicNpcsAPI;
-import com.runicrealms.runicnpcs.command.RunicNpcCommand;
-import com.runicrealms.runicnpcs.config.ConfigUtil;
-import com.runicrealms.runicnpcs.event.EventNpcInteract;
-import com.runicrealms.runicnpcs.listener.ScoreboardHandler;
+import com.runicrealms.plugin.api.RunicNpcsAPI;
+import com.runicrealms.plugin.command.RunicNpcCommand;
+import com.runicrealms.plugin.config.ConfigUtil;
+import com.runicrealms.plugin.event.EventNpcInteract;
+import com.runicrealms.plugin.listener.ScoreboardHandler;
 import com.runicrealms.runicrestart.RunicRestart;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;

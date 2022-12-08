@@ -1,8 +1,8 @@
-package com.runicrealms.runicnpcs.listener;
+package com.runicrealms.plugin.listener;
 
 
-import com.runicrealms.runicnpcs.Npc;
-import com.runicrealms.runicnpcs.RunicNpcs;
+import com.runicrealms.plugin.Npc;
+import com.runicrealms.plugin.RunicNpcs;
 import net.minecraft.server.v1_16_R3.PacketPlayOutScoreboardTeam;
 import net.minecraft.server.v1_16_R3.ScoreboardTeam;
 import net.minecraft.server.v1_16_R3.ScoreboardTeamBase;

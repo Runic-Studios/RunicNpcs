@@ -1,4 +1,4 @@
-package com.runicrealms.runicnpcs.event;
+package com.runicrealms.plugin.event;
 
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.events.ListenerPriority;
@@ -6,9 +6,9 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.runicrealms.runicnpcs.Npc;
-import com.runicrealms.runicnpcs.RunicNpcs;
-import com.runicrealms.runicnpcs.api.NpcClickEvent;
+import com.runicrealms.plugin.Npc;
+import com.runicrealms.plugin.RunicNpcs;
+import com.runicrealms.plugin.api.NpcClickEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 

@@ -1,6 +1,6 @@
-package com.runicrealms.runicnpcs.api;
+package com.runicrealms.plugin.api;
 
-import com.runicrealms.runicnpcs.Npc;
+import com.runicrealms.plugin.Npc;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

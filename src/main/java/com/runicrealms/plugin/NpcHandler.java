@@ -1,13 +1,13 @@
-package com.runicrealms.runicnpcs;
+package com.runicrealms.plugin;
 
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
+import com.runicrealms.plugin.api.RunicNpcsAPI;
 import com.runicrealms.plugin.character.api.CharacterSelectEvent;
-import com.runicrealms.runicnpcs.api.RunicNpcsAPI;
-import com.runicrealms.runicnpcs.config.ConfigUtil;
-import com.runicrealms.runicnpcs.grid.GridBounds;
-import com.runicrealms.runicnpcs.grid.MultiWorldGrid;
-import com.runicrealms.runicnpcs.listener.ScoreboardHandler;
+import com.runicrealms.plugin.config.ConfigUtil;
+import com.runicrealms.plugin.grid.GridBounds;
+import com.runicrealms.plugin.grid.MultiWorldGrid;
+import com.runicrealms.plugin.listener.ScoreboardHandler;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

@@ -1,16 +1,16 @@
-package com.runicrealms.runicnpcs.command;
+package com.runicrealms.plugin.command;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
-import com.runicrealms.runicnpcs.MineskinUtil;
-import com.runicrealms.runicnpcs.Npc;
-import com.runicrealms.runicnpcs.RunicNpcs;
-import com.runicrealms.runicnpcs.Skin;
-import com.runicrealms.runicnpcs.config.ConfigUtil;
-import com.runicrealms.runicnpcs.listener.ScoreboardHandler;
+import com.runicrealms.plugin.MineskinUtil;
+import com.runicrealms.plugin.Npc;
+import com.runicrealms.plugin.RunicNpcs;
+import com.runicrealms.plugin.Skin;
+import com.runicrealms.plugin.config.ConfigUtil;
+import com.runicrealms.plugin.listener.ScoreboardHandler;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -208,7 +208,7 @@ public class RunicNpcCommand extends BaseCommand {
     }
 
     // runicnpc skin <npc> <skin>
-    
+
     @Subcommand("skin")
     @Conditions("is-op")
     public void onSkinCommand(Player player, String[] args) {
