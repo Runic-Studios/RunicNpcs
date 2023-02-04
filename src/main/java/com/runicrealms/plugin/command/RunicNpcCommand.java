@@ -31,8 +31,9 @@ public class RunicNpcCommand extends BaseCommand {
         sendMessage(commandSender, "&2/runicnpc create &a<name> <label> <mineskin-id> &r- Creates an NPC, name & label can have underscores to indicate spaces");
         sendMessage(commandSender, "&2/runicnpc delete &a<npc-id> &r- Deletes an NPC");
         sendMessage(commandSender, "&2/runicnpc id &r- Gives you the NPC ID of the NPC closest to you");
-        sendMessage(commandSender, "&2/runicnpc skin &a<npc-id> <mineskin-id> &r- Updates the skin of the specified npc!");
+        sendMessage(commandSender, "&2/runicnpc move &a<npc-id> &r- Moves the npc to your current location!");
         sendMessage(commandSender, "&2/runicnpc rename &a<npc-id> <name> &r- Updates the name of the specified npc! Use underscores for spaces.");
+        sendMessage(commandSender, "&2/runicnpc skin &a<npc-id> <mineskin-id> &r- Updates the skin of the specified npc!");
     }
 
     private static boolean isInt(String number) {
@@ -164,7 +165,7 @@ public class RunicNpcCommand extends BaseCommand {
 
     // runicnpc move <npc>
 
-    @Subcommand("move")
+    @Subcommand("move|movehere")
     @Conditions("is-op")
     public void onMoveCommand(Player player, String[] args) {
         if (args.length != 1 || !isInt(args[0])) {
@@ -179,8 +180,9 @@ public class RunicNpcCommand extends BaseCommand {
             return;
         }
         npc.setNewLocation(npcLocation);
-        sendMessage(player, "&aNpc has been moved, but it will only change visually after you /rstop because I am lazy.");
+        sendMessage(player, "&aNpc has been moved! New location will be visible upon /rstop");
         ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
+        RunicNpcs.updateNpcs();
     }
 
     // runicnpc rename <npc> <name>
