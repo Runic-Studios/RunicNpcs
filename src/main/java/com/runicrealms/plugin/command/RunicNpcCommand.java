@@ -198,7 +198,7 @@ public class RunicNpcCommand extends BaseCommand {
                         Npc npc = RunicNpcs.getNpcs().get(Integer.valueOf(args[0]));
                         npc.setName(name);
                         ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
-                        sendMessage(player, "&aNPC name updated! Name color will update on next rstop.");
+                        sendMessage(player, "&aNPC name updated!");
                     });
                 } else {
                     sendMessage(player, "&cCommand returned invalid.");
@@ -250,7 +250,7 @@ public class RunicNpcCommand extends BaseCommand {
                         Npc npc = RunicNpcs.getNpcs().get(Integer.valueOf(args[0]));
                         npc.setLabel(npcTag.getChatColor() + npcTag.getIdentifier());
                         ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
-                        sendMessage(player, "&aNPC tag updated! Tag will update on next rstop.");
+                        sendMessage(player, "&aNPC tag updated!");
                     });
                 } else {
                     sendMessage(player, "&cCommand returned invalid.");
