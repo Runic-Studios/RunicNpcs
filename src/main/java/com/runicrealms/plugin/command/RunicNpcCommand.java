@@ -5,10 +5,7 @@ import co.aikar.commands.annotation.*;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
-import com.runicrealms.plugin.MineskinUtil;
-import com.runicrealms.plugin.Npc;
-import com.runicrealms.plugin.RunicNpcs;
-import com.runicrealms.plugin.Skin;
+import com.runicrealms.plugin.*;
 import com.runicrealms.plugin.config.ConfigUtil;
 import com.runicrealms.plugin.listener.ScoreboardHandler;
 import org.bukkit.Bukkit;
@@ -86,9 +83,12 @@ public class RunicNpcCommand extends BaseCommand {
                     Location npcLocation = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getY(), player.getLocation().getBlockZ() + 0.5, player.getLocation().getYaw(), player.getLocation().getPitch());
                     Hologram hologram = HologramsAPI.createHologram(RunicNpcs.getInstance(), new Location(npcLocation.getWorld(), npcLocation.getX(), npcLocation.getY() + RunicNpcs.HOLOGRAM_VERTICAL_OFFSET, npcLocation.getZ()));
                     hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + args[0].replaceAll("_", " ")));
-                    hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&',
-                            (args[1].equalsIgnoreCase("Merchant") ? "&a" : (args[1].equalsIgnoreCase("Quest") ? "&6" : "&7")) +
-                                    args[1].replaceAll("_", " ")));
+                    NpcTag npcTag = NpcTag.getFromIdentifier(args[1]);
+                    if (npcTag == null) {
+                        player.sendMessage(ChatColor.YELLOW + "Error, NPC tag was not a valid value");
+                        return;
+                    }
+                    hologram.appendTextLine(npcTag.getChatColor() + npcTag.getIdentifier());
                     Integer id = RunicNpcs.getNextId();
                     Npc npc = new Npc(npcLocation, skin, id, hologram, UUID.randomUUID(), true);
                     ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
@@ -226,6 +226,34 @@ public class RunicNpcCommand extends BaseCommand {
                     });
                 } else {
                     sendMessage(player, "&cSkin invalid. Did you copy the end of the MineSkin URL?");
+                }
+            });
+        } else {
+            sendHelpMessage(player);
+        }
+    }
+
+    // runicnpc tag <npc> <tag>
+
+    @Subcommand("tag|retag")
+    @Conditions("is-op")
+    public void onTagCommand(Player player, String[] args) {
+        if (args.length == 2) {
+            Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
+                if (args[1] != null) {
+                    NpcTag npcTag = NpcTag.getFromIdentifier(args[1]);
+                    if (npcTag == null) {
+                        sendMessage(player, "&cPlease enter a valid tag");
+                        return;
+                    }
+                    Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
+                        Npc npc = RunicNpcs.getNpcs().get(Integer.valueOf(args[0]));
+                        npc.setLabel(npcTag.getChatColor() + npcTag.getIdentifier());
+                        ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
+                        sendMessage(player, "&aNPC tag updated! Tag will update on next rstop.");
+                    });
+                } else {
+                    sendMessage(player, "&cCommand returned invalid.");
                 }
             });
         } else {

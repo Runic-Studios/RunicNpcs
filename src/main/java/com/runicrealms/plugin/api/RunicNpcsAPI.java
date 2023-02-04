@@ -1,6 +1,7 @@
 package com.runicrealms.plugin.api;
 
 import com.runicrealms.plugin.Npc;
+import com.runicrealms.plugin.NpcTag;
 import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
@@ -14,12 +15,12 @@ public interface RunicNpcsAPI {
      *
      * @param location where the npc will be stationed
      * @param name     the hologram display name
-     * @param label    of the npc hologram e.g. "merchant"
+     * @param npcTag   of the npc hologram e.g. "merchant"
      * @param skinId   the mine skin id
      * @param shown    whether the npc should be displayed
      * @return an npc object
      */
-    Npc createNpc(Location location, String name, String label, String skinId, boolean shown);
+    Npc createNpc(Location location, String name, NpcTag npcTag, String skinId, boolean shown);
 
     /**
      * Adds the player to the loaded npc list
