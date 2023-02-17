@@ -10,6 +10,7 @@ import com.runicrealms.plugin.Npc;
 import com.runicrealms.plugin.RunicNpcs;
 import com.runicrealms.plugin.api.NpcClickEvent;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -41,7 +42,9 @@ public class EventNpcInteract implements Listener {
                     int entityID = packet.getIntegers().read(0);
                     Npc npc = RunicNpcs.getNpcEntities().get(entityID);
                     if (npc == null) return;
-                    npcTalkers.add(event.getPlayer().getUniqueId());
+                    if (event.getPlayer().getInventory().getItemInMainHand().getType() != Material.AIR) {
+                        npcTalkers.add(event.getPlayer().getUniqueId());
+                    }
                     Bukkit.getScheduler().scheduleSyncDelayedTask(RunicNpcs.getInstance(),
                             () -> Bukkit.getServer().getPluginManager().callEvent(new NpcClickEvent(npc, event.getPlayer())));
                 }
