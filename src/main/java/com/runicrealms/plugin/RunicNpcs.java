@@ -1,9 +1,9 @@
 package com.runicrealms.plugin;
 
-import co.aikar.commands.ConditionFailedException;
-import co.aikar.commands.PaperCommandManager;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import com.runicrealms.libs.acf.ConditionFailedException;
+import com.runicrealms.libs.acf.PaperCommandManager;
 import com.runicrealms.plugin.api.RunicNpcsAPI;
 import com.runicrealms.plugin.command.RunicNpcCommand;
 import com.runicrealms.plugin.config.ConfigUtil;
