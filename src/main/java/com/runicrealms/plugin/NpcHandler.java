@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.util.HashMap;
@@ -176,6 +177,13 @@ public class NpcHandler implements Listener, RunicNpcsAPI {
     @EventHandler
     public void onQuit(PlayerQuitEvent event) {
         LOADED_NPCS.remove(event.getPlayer());
+    }
+
+    @EventHandler
+    public void onPlayerChangeWorld(PlayerChangedWorldEvent event) {
+        if (LOADED_NPCS.containsKey(event.getPlayer())) {
+            updateNpcsForPlayer(event.getPlayer());
+        }
     }
 
 }
