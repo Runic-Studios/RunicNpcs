@@ -13,7 +13,6 @@ dependencies {
     compileOnly(commonLibs.paper)
     compileOnly(commonLibs.protocollib)
     compileOnly(commonLibs.holographicdisplays)
-    compileOnly(project(":Projects:Core"))
     compileOnly(project(":Projects:Restart"))
 }
 
