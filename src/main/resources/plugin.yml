@@ -3,6 +3,6 @@ description: Runic Realms NPCs RunicNpcs, by Excel
 version: 1.0
 main: com.runicrealms.plugin.RunicNpcs
 api-version: 1.13
-depend: [ HolographicDisplays, RunicRestart ]
+depend: [ HolographicDisplays, RunicRestart, RunicCommon ]
 softdepend:
   - RunicCore
