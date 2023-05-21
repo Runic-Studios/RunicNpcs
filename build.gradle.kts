@@ -5,6 +5,7 @@ plugins {
 
 group = "com.runicrealms.plugin"
 version = "1.0-SNAPSHOT"
+val artifactName = "npcs"
 
 dependencies {
     compileOnly(commonLibs.acf)
@@ -14,6 +15,7 @@ dependencies {
     compileOnly(commonLibs.protocollib)
     compileOnly(commonLibs.holographicdisplays)
     compileOnly(project(":Projects:Restart"))
+    compileOnly(project(":Projects:Common"))
 }
 
 java {
@@ -24,12 +26,9 @@ publishing {
     publications {
         create<MavenPublication>("maven") {
             groupId = "com.runicrealms.plugin"
-            artifactId = "npcs"
+            artifactId = artifactName
             version = "1.0-SNAPSHOT"
             from(components["java"])
         }
     }
 }
-
-tasks.register("wrapper")
-tasks.register("prepareKotlinBuildScriptModel")
