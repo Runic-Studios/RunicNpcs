@@ -3,7 +3,6 @@ package com.runicrealms.plugin;
 import com.gmail.filoghost.holographicdisplays.api.Hologram;
 import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.runicrealms.plugin.api.RunicNpcsAPI;
-import com.runicrealms.plugin.character.api.CharacterSelectEvent;
 import com.runicrealms.plugin.config.ConfigUtil;
 import com.runicrealms.plugin.grid.GridBounds;
 import com.runicrealms.plugin.grid.MultiWorldGrid;
@@ -139,8 +138,14 @@ public class NpcHandler implements Listener, RunicNpcsAPI {
 
     @Override
     public void updateNpcsForPlayer(Player player) {
-        if (!hasLoadedDataForPlayer(player))
-            throw new IllegalStateException("Cannot update NPCs before data is loaded for player!");
+        if (!hasLoadedDataForPlayer(player)) {
+            //throw new IllegalStateException("Cannot update NPCs before data is loaded for player!");
+            HashMap<Npc, Boolean> npcs = new HashMap<>();
+            for (Map.Entry<Integer, Npc> entry : RunicNpcs.getNpcEntities().entrySet()) {
+                npcs.put(entry.getValue(), false);
+            }
+            LOADED_NPCS.put(player, npcs);
+        }
         Set<Npc> surrounding = grid.getSurroundingElements(player.getLocation(), (short) 2);
         for (Map.Entry<Npc, Boolean> entry : LOADED_NPCS.get(player).entrySet()) {
             if (entry.getValue()) {
@@ -155,16 +160,6 @@ public class NpcHandler implements Listener, RunicNpcsAPI {
                 }
             }
         }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST) // runs late
-    public void onCharacterSelect(CharacterSelectEvent event) {
-        HashMap<Npc, Boolean> npcs = new HashMap<>();
-        for (Map.Entry<Integer, Npc> entry : RunicNpcs.getNpcEntities().entrySet()) {
-            npcs.put(entry.getValue(), false);
-        }
-        LOADED_NPCS.put(event.getPlayer(), npcs);
-        updateNpcsForPlayer(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.LOW)
