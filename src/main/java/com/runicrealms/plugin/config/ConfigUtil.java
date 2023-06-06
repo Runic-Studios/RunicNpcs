@@ -104,7 +104,7 @@ public class ConfigUtil {
      * @param config the section of the file config
      */
     public static void saveNpc(Npc npc, FileConfiguration config) {
-        Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
+        Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
             config.set("npcs." + npc.getId() + ".hologram.world", npc.getHologram().getLocation().getWorld().getName());
             Location location = npc.hasNewLocation() ? npc.getNewLocation() : npc.getLocation();
             Location hologramLocation = npc.hasNewLocation() ? npc.getNewLocation().clone().add(0, RunicNpcs.HOLOGRAM_VERTICAL_OFFSET, 0) : npc.getHologram().getLocation();
@@ -122,11 +122,13 @@ public class ConfigUtil {
             config.set("npcs." + npc.getId() + ".skin-texture", npc.getSkin().getTexture());
             config.set("npcs." + npc.getId() + ".skin-signature", npc.getSkin().getSignature());
             config.set("npcs." + npc.getId() + ".shown", npc.isShown());
-            try {
-                config.save(new File(RunicNpcs.getInstance().getDataFolder(), "npcs.yml"));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
+                try {
+                    config.save(new File(RunicNpcs.getInstance().getDataFolder(), "npcs.yml"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         });
     }
 
