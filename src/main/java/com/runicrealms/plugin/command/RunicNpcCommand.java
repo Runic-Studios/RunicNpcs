@@ -163,11 +163,15 @@ public class RunicNpcCommand extends BaseCommand {
                     }
                 }
             }
-            if (closest != -1) {
-                sendMessage(player, "&aID of NPC \"" + ChatColor.stripColor(((TextLine) closestNpc.getHologram().getLine(0)).getText()) + "\" is " + closestNpc.getId() + ".");
-            } else {
-                sendMessage(player, "&cThere are no NPCs in the world!");
-            }
+            double finalClosest = closest;
+            Npc finalClosestNpc = closestNpc;
+            Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
+                if (finalClosest != -1) {
+                    sendMessage(player, "&aID of NPC \"" + ChatColor.stripColor(((TextLine) finalClosestNpc.getHologram().getLine(0)).getText()) + "\" is " + finalClosestNpc.getId() + ".");
+                } else {
+                    sendMessage(player, "&cThere are no NPCs in the world!");
+                }
+            });
         });
     }
 
@@ -187,10 +191,12 @@ public class RunicNpcCommand extends BaseCommand {
             sendMessage(player, "&cThat is not a valid NPC id!");
             return;
         }
-        npc.setNewLocation(npcLocation);
-        sendMessage(player, "&aNpc has been moved! New location will be visible upon /rstop");
-        ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
-        RunicNpcs.updateNpcs();
+        Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
+            npc.setNewLocation(npcLocation);
+            sendMessage(player, "&aNpc has been moved! New location will be visible upon /rstop");
+            ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
+            RunicNpcs.updateNpcs();
+        });
     }
 
     // runicnpc rename <npc> <name>
