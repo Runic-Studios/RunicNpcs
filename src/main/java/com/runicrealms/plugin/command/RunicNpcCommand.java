@@ -3,6 +3,7 @@ package com.runicrealms.plugin.command;
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.CatchUnknown;
 import co.aikar.commands.annotation.CommandAlias;
+import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Conditions;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 
 @CommandAlias("runicnpc|npc")
+@CommandPermission("runic.op")
 public class RunicNpcCommand extends BaseCommand {
 
     private static void sendMessage(CommandSender commandSender, String message) {
