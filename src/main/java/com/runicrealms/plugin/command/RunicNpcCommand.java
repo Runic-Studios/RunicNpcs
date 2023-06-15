@@ -7,9 +7,8 @@ import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Conditions;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
-import com.gmail.filoghost.holographicdisplays.api.Hologram;
-import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
-import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
+import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
+import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import com.runicrealms.plugin.MineskinUtil;
 import com.runicrealms.plugin.Npc;
 import com.runicrealms.plugin.NpcTag;
@@ -17,6 +16,7 @@ import com.runicrealms.plugin.RunicNpcs;
 import com.runicrealms.plugin.Skin;
 import com.runicrealms.plugin.config.ConfigUtil;
 import com.runicrealms.plugin.listener.ScoreboardHandler;
+import me.filoghost.holographicdisplays.api.hologram.line.TextHologramLine;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -66,7 +66,7 @@ public class RunicNpcCommand extends BaseCommand {
     public void onCommandInfo(Player player, String[] args) {
         if (args.length == 1 && RunicNpcs.getNpcs().get(Integer.valueOf(args[0])) != null) {
             Npc npc = RunicNpcs.getNpcs().get(Integer.valueOf(args[0]));
-            sendMessage(player, ChatColor.GREEN + "NPC Name: " + ChatColor.stripColor(((TextLine) npc.getHologram().getLine(0)).getText()));
+            sendMessage(player, ChatColor.GREEN + "NPC Name: " + ChatColor.stripColor(((TextHologramLine) npc.getHologram().getLines().get(0)).getText()));
             sendMessage(player,
                     ChatColor.GREEN + "NPC Location: " +
                             npc.getLocation().getX() + "x " +
@@ -91,14 +91,14 @@ public class RunicNpcCommand extends BaseCommand {
             if (skin != null) {
                 Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
                     Location npcLocation = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getY(), player.getLocation().getBlockZ() + 0.5, player.getLocation().getYaw(), player.getLocation().getPitch());
-                    Hologram hologram = HologramsAPI.createHologram(RunicNpcs.getInstance(), new Location(npcLocation.getWorld(), npcLocation.getX(), npcLocation.getY() + RunicNpcs.HOLOGRAM_VERTICAL_OFFSET, npcLocation.getZ()));
-                    hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + args[0].replaceAll("_", " ")));
+                    Hologram hologram = HolographicDisplaysAPI.get(RunicNpcs.getInstance()).createHologram(new Location(npcLocation.getWorld(), npcLocation.getX(), npcLocation.getY() + RunicNpcs.HOLOGRAM_VERTICAL_OFFSET, npcLocation.getZ()));
+                    hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', "&e" + args[0].replaceAll("_", " ")));
                     NpcTag npcTag = NpcTag.getFromIdentifier(args[1]);
                     if (npcTag == null) {
                         player.sendMessage(ChatColor.YELLOW + "Error, NPC tag was not a valid value");
                         return;
                     }
-                    hologram.appendTextLine(npcTag.getChatColor() + npcTag.getIdentifier());
+                    hologram.getLines().appendText(npcTag.getChatColor() + npcTag.getIdentifier());
                     Integer id = RunicNpcs.getNextId();
                     Npc npc = new Npc(npcLocation, skin, id, hologram, UUID.randomUUID(), true);
                     ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
@@ -169,7 +169,7 @@ public class RunicNpcCommand extends BaseCommand {
             Npc finalClosestNpc = closestNpc;
             Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
                 if (finalClosest != -1) {
-                    sendMessage(player, "&aID of NPC \"" + ChatColor.stripColor(((TextLine) finalClosestNpc.getHologram().getLine(0)).getText()) + "\" is " + finalClosestNpc.getId() + ".");
+                    sendMessage(player, "&aID of NPC \"" + ChatColor.stripColor(((TextHologramLine) finalClosestNpc.getHologram().getLines().get(0)).getText()) + "\" is " + finalClosestNpc.getId() + ".");
                 } else {
                     sendMessage(player, "&cThere are no NPCs in the world!");
                 }

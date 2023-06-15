@@ -1,91 +1,72 @@
 package com.runicrealms.plugin;
 
-import com.gmail.filoghost.holographicdisplays.api.Hologram;
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
-import com.mojang.authlib.properties.PropertyMap;
-import net.minecraft.server.v1_16_R3.DataWatcher;
-import net.minecraft.server.v1_16_R3.DataWatcherObject;
-import net.minecraft.server.v1_16_R3.DataWatcherRegistry;
-import net.minecraft.server.v1_16_R3.EntityPlayer;
-import net.minecraft.server.v1_16_R3.EnumProtocolDirection;
-import net.minecraft.server.v1_16_R3.MinecraftServer;
-import net.minecraft.server.v1_16_R3.NetworkManager;
-import net.minecraft.server.v1_16_R3.PacketPlayOutEntityDestroy;
-import net.minecraft.server.v1_16_R3.PacketPlayOutEntityHeadRotation;
-import net.minecraft.server.v1_16_R3.PacketPlayOutEntityMetadata;
-import net.minecraft.server.v1_16_R3.PacketPlayOutNamedEntitySpawn;
-import net.minecraft.server.v1_16_R3.PacketPlayOutPlayerInfo;
-import net.minecraft.server.v1_16_R3.PlayerConnection;
-import net.minecraft.server.v1_16_R3.PlayerInteractManager;
-import net.minecraft.server.v1_16_R3.WorldServer;
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLib;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.utility.MinecraftReflection;
+import com.comphenix.protocol.wrappers.*;
+import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_16_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_16_R3.CraftWorld;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.metadata.FixedMetadataValue;
 
+import java.util.Collections;
+import java.util.Random;
 import java.util.UUID;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Npc {
 
-    private final GameProfile gameProfile;
+    private final WrappedGameProfile gameProfile;
     private final Location location;
-    private final DataWatcher watcher;
-    private final int id;
+    private final WrappedDataWatcher watcher;
+    private final int id, entityId;
     private final Hologram hologram;
     private final UUID uuid;
-    public EntityPlayer entityPlayer;
     private Skin skin;
     private Location newLocation = null; // Changes when we move an NPC to be saved on restart
 
     private boolean shown;
 
     public Npc(Location location, Skin skin, Integer id, Hologram hologram, UUID uuid, boolean shown) {
-        this.id = id;
-        this.skin = skin;
-        this.uuid = uuid;
-        gameProfile = new GameProfile(uuid, "npc_" + id);
-        PropertyMap properties = gameProfile.getProperties();
-        if (properties.get("textures").iterator().hasNext()) {
-            properties.remove("textures", properties.get("textures").iterator().next());
-        }
-        properties.put("textures", new Property("textures", this.skin.getTexture(), this.skin.getSignature()));
         this.location = location;
-        MinecraftServer minecraftServer = ((CraftServer) Bukkit.getServer()).getServer();
-        WorldServer worldServer = ((CraftWorld) this.location.getWorld()).getHandle();
-        this.entityPlayer = new EntityPlayer(minecraftServer, worldServer, this.gameProfile, new PlayerInteractManager(worldServer));
-        this.entityPlayer.playerConnection = new PlayerConnection(minecraftServer, new NetworkManager(EnumProtocolDirection.CLIENTBOUND), this.entityPlayer);
-        this.entityPlayer.setHealth(1f);
-        this.entityPlayer.getBukkitEntity().setMetadata("NPC", new FixedMetadataValue(RunicNpcs.getInstance(), true));
-        this.entityPlayer.setNoGravity(true);
-        this.entityPlayer.setLocation(this.location.getX(), this.location.getY(), this.location.getZ(), this.location.getYaw(), this.location.getPitch());
-        this.watcher = this.entityPlayer.getDataWatcher();
-        this.watcher.set(new DataWatcherObject<>(16, DataWatcherRegistry.a), (byte) 127);
+        this.skin = skin;
+        this.id = id;
         this.hologram = hologram;
+        this.uuid = uuid;
         this.shown = shown;
+        this.entityId = new Random().nextInt(9999 - 1000 + 1) + 1000;
+
+        this.gameProfile = new WrappedGameProfile(uuid, "npc_" + id);
+        gameProfile.getProperties().put("textures", new WrappedSignedProperty("textures", skin.getTexture(), skin.getSignature()));
+
+        WrappedDataWatcher dataWatcher = new WrappedDataWatcher();
+        dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(6, WrappedDataWatcher.Registry.get(Byte.class)), (byte) 0x10); // NoGravity flag
+        dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(16, WrappedDataWatcher.Registry.get(Byte.class)), (byte) 127);
+        dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(17,WrappedDataWatcher.Registry.get(Boolean.class)), true); // isNpc metadata
+        // If the NPC has a custom skin, add it to the data watcher
+        //dataWatcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(14, ), gameProfile);
+
+        this.watcher = dataWatcher;
+
     }
 
     public void delete(boolean despawn) {
         this.hologram.delete();
-        this.entityPlayer.die();
         if (despawn)
             Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(this::despawnForPlayer));
     }
 
     public void despawnForPlayer(Player player) {
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityDestroy(this.entityPlayer.getId()));
+        PacketContainer deathPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_DESTROY);
+        deathPacket.getIntegerArrays().write(0, new int[]{this.getEntityId()});
+
+        ProtocolLibrary.getProtocolManager().sendServerPacket(player, deathPacket);
     }
 
     public Integer getEntityId() {
-        return this.entityPlayer.getId();
-    }
-
-    public EntityPlayer getEntityPlayer() {
-        return this.entityPlayer;
+        return this.getId();
     }
 
     public Hologram getHologram() {
@@ -100,12 +81,12 @@ public class Npc {
      * @return the label of the Npc "Merchant," "Quest," etc.
      */
     public String getLabel() {
-        return this.hologram.getLine(1).toString();
+        return this.hologram.getLines().get(1).toString();
     }
 
     public void setLabel(String label) {
-        this.hologram.getLine(1).removeLine();
-        this.hologram.insertTextLine(1, label);
+        this.hologram.getLines().remove(1);
+        this.hologram.getLines().insertText(1, label);
     }
 
     public Location getLocation() {
@@ -113,12 +94,12 @@ public class Npc {
     }
 
     public String getName() {
-        return this.hologram.getLine(0).toString();
+        return this.hologram.getLines().get(0).toString();
     }
 
     public void setName(String name) {
-        this.hologram.getLine(0).removeLine();
-        this.hologram.insertTextLine(0, name);
+        this.hologram.getLines().remove(0);
+        this.hologram.getLines().insertText(0, name);
     }
 
     public Location getNewLocation() {
@@ -155,13 +136,52 @@ public class Npc {
     }
 
     public void rotateHeadForPlayer(Player player) {
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityHeadRotation(this.entityPlayer, (byte) ((this.location.getYaw() * 256.0F) / 360.0F)));
+        PacketContainer rotatePacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_HEAD_ROTATION);
+        rotatePacket.getIntegers().write(0, this.entityId);
+        rotatePacket.getBytes().write(0, (byte) ((this.location.getYaw() * 256.05) / 360F));
+
+        ProtocolLibrary.getProtocolManager().sendServerPacket(player, rotatePacket);
     }
 
     public void spawnForPlayer(Player player) {
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, this.entityPlayer));
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutNamedEntitySpawn(this.entityPlayer));
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutEntityMetadata(this.entityPlayer.getId(), this.watcher, true));
+//        PacketContainer addPlayerPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.PLAYER_INFO);
+//        addPlayerPacket.getPlayerInfoAction().write(0, EnumWrappers.PlayerInfoAction.ADD_PLAYER);
+//        addPlayerPacket.getPlayerInfoDataLists().write(0, Collections.singletonList(
+//                new PlayerInfoData(this.gameProfile, 0, EnumWrappers.NativeGameMode.SURVIVAL, WrappedChatComponent.fromText(this.getName()))
+//        ));
+//
+//        PacketContainer namedEntitySpawnPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.NAMED_ENTITY_SPAWN);
+//        namedEntitySpawnPacket.getIntegers().write(0, this.entityId);
+//        namedEntitySpawnPacket.getUUIDs().write(0, this.uuid);
+//        namedEntitySpawnPacket.getDoubles().write(0, this.location.getX());
+//        namedEntitySpawnPacket.getDoubles().write(1, this.location.getY());
+//        namedEntitySpawnPacket.getDoubles().write(2, this.location.getZ());
+//        namedEntitySpawnPacket.getBytes().write(0, (byte) (this.location.getYaw() * 256.0F / 360.0F));
+//        namedEntitySpawnPacket.getBytes().write(1, (byte) (this.location.getPitch() * 256.0F / 360.0F));
+//
+//        PacketContainer updateHealthPacket = new PacketContainer(PacketType.Play.Server.UPDATE_HEALTH);
+//        updateHealthPacket.getFloat().write(0, 1f);
+//
+//        PacketContainer entityMetadataPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.ENTITY_METADATA);
+//        entityMetadataPacket.getIntegers().write(0, this.entityId);
+//        entityMetadataPacket.getWatchableCollectionModifier().write(0, this.watcher.getWatchableObjects());
+//
+//        ProtocolLibrary.getProtocolManager().sendServerPacket(player, addPlayerPacket);
+//        ProtocolLibrary.getProtocolManager().sendServerPacket(player, updateHealthPacket);
+//        ProtocolLibrary.getProtocolManager().sendServerPacket(player, namedEntitySpawnPacket);
+//        ProtocolLibrary.getProtocolManager().sendServerPacket(player, entityMetadataPacket);
+
+        PacketContainer spawnPacket = ProtocolLibrary.getProtocolManager().createPacket(PacketType.Play.Server.SPAWN_ENTITY_LIVING);
+        spawnPacket.getIntegers().write(0, this.entityId); // Entity ID
+        spawnPacket.getUUIDs().write(0, this.uuid); // Entity UUID
+        spawnPacket.getIntegers().write(1, 118); // Entity Type ID (0 for a generic living entity)
+        spawnPacket.getDoubles().write(0, this.location.getX());
+        spawnPacket.getDoubles().write(1, this.location.getY());
+        spawnPacket.getDoubles().write(2, this.location.getZ());
+        spawnPacket.getBytes().write(0, (byte) (this.location.getYaw() * 256.0F / 360.0F));
+        spawnPacket.getBytes().write(1, (byte) (this.location.getPitch() * 256.0F / 360.0F));
+        spawnPacket.getDataWatcherModifier().write(0, this.watcher);
+
         rotateHeadForPlayer(player);
     }
 

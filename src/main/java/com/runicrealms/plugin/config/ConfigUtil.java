@@ -1,11 +1,11 @@
 package com.runicrealms.plugin.config;
 
-import com.gmail.filoghost.holographicdisplays.api.Hologram;
-import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
-import com.gmail.filoghost.holographicdisplays.api.line.TextLine;
 import com.runicrealms.plugin.Npc;
 import com.runicrealms.plugin.RunicNpcs;
 import com.runicrealms.plugin.Skin;
+import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
+import me.filoghost.holographicdisplays.api.hologram.Hologram;
+import me.filoghost.holographicdisplays.api.hologram.line.TextHologramLine;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -43,12 +43,12 @@ public class ConfigUtil {
         if (config.contains("npcs")) {
             ConfigurationSection npcsSection = config.getConfigurationSection("npcs");
             for (String key : npcsSection.getKeys(false)) {
-                Hologram hologram = HologramsAPI.createHologram(RunicNpcs.getInstance(), new Location(
+                Hologram hologram = HolographicDisplaysAPI.get(RunicNpcs.getInstance()).createHologram(new Location(
                         Bukkit.getWorld(npcsSection.getString(key + ".hologram.world")),
                         Double.parseDouble(npcsSection.getString(key + ".hologram.x")),
                         Double.parseDouble(npcsSection.getString(key + ".hologram.y")),
                         Double.parseDouble(npcsSection.getString(key + ".hologram.z"))));
-                hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + npcsSection.getString(key + ".hologram.name")));
+                hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', "&e" + npcsSection.getString(key + ".hologram.name")));
                 String color = "";
                 String colored = ChatColor.translateAlternateColorCodes('&', npcsSection.getString(key + ".hologram.label"));
                 if (ChatColor.stripColor(colored).equalsIgnoreCase(colored)) {
@@ -60,7 +60,7 @@ public class ConfigUtil {
                         color = "&7";
                     }
                 }
-                hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', color + npcsSection.getString(key + ".hologram.label")));
+                hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', color + npcsSection.getString(key + ".hologram.label")));
                 Npc npc = new Npc(
                         new Location(
                                 Bukkit.getWorld(npcsSection.getString(key + ".location.world")),
@@ -77,6 +77,7 @@ public class ConfigUtil {
                 npcs.put(Integer.parseInt(key), npc);
             }
         }
+        Bukkit.broadcastMessage("Total NPCs Loaded:" + npcs.size());
         RunicNpcs.setNpcs(npcs);
         RunicNpcs.setNpcEntityIds(sortNpcsByEntityId(npcs));
         RunicNpcs.getAPI().placeNpcsInGrid(npcs);
@@ -105,14 +106,14 @@ public class ConfigUtil {
      */
     public static void saveNpc(Npc npc, FileConfiguration config) {
         Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
-            config.set("npcs." + npc.getId() + ".hologram.world", npc.getHologram().getLocation().getWorld().getName());
+            config.set("npcs." + npc.getId() + ".hologram.world", npc.getHologram().getPosition().toLocation().getWorld().getName());
             Location location = npc.hasNewLocation() ? npc.getNewLocation() : npc.getLocation();
-            Location hologramLocation = npc.hasNewLocation() ? npc.getNewLocation().clone().add(0, RunicNpcs.HOLOGRAM_VERTICAL_OFFSET, 0) : npc.getHologram().getLocation();
+            Location hologramLocation = npc.hasNewLocation() ? npc.getNewLocation().clone().add(0, RunicNpcs.HOLOGRAM_VERTICAL_OFFSET, 0) : npc.getHologram().getPosition().toLocation();
             config.set("npcs." + npc.getId() + ".hologram.x", hologramLocation.getX());
             config.set("npcs." + npc.getId() + ".hologram.y", hologramLocation.getY());
             config.set("npcs." + npc.getId() + ".hologram.z", hologramLocation.getZ());
-            config.set("npcs." + npc.getId() + ".hologram.name", ChatColor.stripColor(((TextLine) npc.getHologram().getLine(0)).getText()));
-            config.set("npcs." + npc.getId() + ".hologram.label", ChatColor.stripColor(((TextLine) npc.getHologram().getLine(1)).getText()));
+            config.set("npcs." + npc.getId() + ".hologram.name", ChatColor.stripColor(((TextHologramLine) npc.getHologram().getLines().get(0)).getText()));
+            config.set("npcs." + npc.getId() + ".hologram.label", ChatColor.stripColor(((TextHologramLine) npc.getHologram().getLines().get(1)).getText()));
             config.set("npcs." + npc.getId() + ".location.world", location.getWorld().getName());
             config.set("npcs." + npc.getId() + ".location.x", location.getX());
             config.set("npcs." + npc.getId() + ".location.y", location.getY());

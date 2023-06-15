@@ -1,14 +1,14 @@
 package com.runicrealms.plugin.listener;
 
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.reflect.StructureModifier;
+import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.runicrealms.plugin.Npc;
 import com.runicrealms.plugin.RunicNpcs;
-import net.minecraft.server.v1_16_R3.PacketPlayOutScoreboardTeam;
-import net.minecraft.server.v1_16_R3.ScoreboardTeam;
-import net.minecraft.server.v1_16_R3.ScoreboardTeamBase;
 import org.bukkit.Bukkit;
-import org.bukkit.craftbukkit.v1_16_R3.entity.CraftPlayer;
-import org.bukkit.craftbukkit.v1_16_R3.scoreboard.CraftScoreboard;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -16,34 +16,36 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scoreboard.Scoreboard;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 public class ScoreboardHandler implements Listener {
 
     private static final List<String> NPC_NAMES = new ArrayList<>();
-    private static ScoreboardTeam team;
+    private static String teamName;
 
     public static void initScoreboard() {
         for (Map.Entry<Integer, Npc> entry : RunicNpcs.getNpcs().entrySet()) {
-            NPC_NAMES.add(entry.getValue().getEntityPlayer().getName());
+            NPC_NAMES.add(entry.getValue().getName());
         }
-        Scoreboard scoreboard = Bukkit.getScoreboardManager().getNewScoreboard();
-        team = new ScoreboardTeam(((CraftScoreboard) scoreboard).getHandle(), "npcs");
-        team.setNameTagVisibility(ScoreboardTeamBase.EnumNameTagVisibility.NEVER);
+        teamName = "npcs";
     }
 
     public static void addNpcName(Npc npc) {
-        NPC_NAMES.add(npc.getEntityPlayer().getName());
+        NPC_NAMES.add(npc.getName());
     }
 
     public static void removeNpcName(Npc npc) {
-        NPC_NAMES.remove(npc.getEntityPlayer().getName());
+        NPC_NAMES.remove(npc.getName());
     }
 
     public static void sendScoreboardPackets(Player player) {
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(team, 0));
-        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(team, NPC_NAMES, 3));
+        PacketContainer createTeamPacket = createCreateTeamPacket();
+        PacketContainer addPlayersPacket = createAddPlayersPacket();
+
+        ProtocolLibrary.getProtocolManager().sendServerPacket(player, createTeamPacket);
+        ProtocolLibrary.getProtocolManager().sendServerPacket(player, addPlayersPacket);
     }
 
     @EventHandler
@@ -51,4 +53,20 @@ public class ScoreboardHandler implements Listener {
         sendScoreboardPackets(event.getPlayer());
     }
 
+    private static PacketContainer createCreateTeamPacket() {
+        PacketContainer scoreboardTeamPacket = new PacketContainer(PacketType.Play.Server.SCOREBOARD_TEAM);
+        scoreboardTeamPacket.getStrings().write(0, teamName);
+        return scoreboardTeamPacket;
+    }
+
+    private static PacketContainer createAddPlayersPacket() {
+        PacketContainer scoreboardTeamPacket = new PacketContainer(PacketType.Play.Server.SCOREBOARD_TEAM);
+
+        scoreboardTeamPacket.getStrings().write(0, teamName);
+        StructureModifier<Collection<String>> modifier = scoreboardTeamPacket.getModifier().withType(Collection.class);
+        modifier.write(0, NPC_NAMES);
+        scoreboardTeamPacket.getIntegers().write(0, 3); // PackOption 3 represents creating a new team
+
+        return scoreboardTeamPacket;
+    }
 }

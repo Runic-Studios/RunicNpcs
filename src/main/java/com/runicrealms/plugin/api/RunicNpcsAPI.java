@@ -2,8 +2,8 @@ package com.runicrealms.plugin.api;
 
 import com.runicrealms.plugin.Npc;
 import com.runicrealms.plugin.NpcTag;
-import net.minecraft.server.v1_16_R3.EntityPlayer;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
 import java.util.Map;
@@ -52,10 +52,10 @@ public interface RunicNpcsAPI {
     boolean hasLoadedDataForPlayer(Player player);
 
     /**
-     * @param entityPlayer to check
+     * @param entity to check
      * @return true if the entity is contained in the npc collection
      */
-    boolean isNpc(EntityPlayer entityPlayer);
+    boolean isNpc(Entity entity);
 
     /**
      * Places a npc in the virtual grid

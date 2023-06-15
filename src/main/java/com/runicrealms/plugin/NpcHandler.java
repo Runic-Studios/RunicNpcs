@@ -1,16 +1,16 @@
 package com.runicrealms.plugin;
 
-import com.gmail.filoghost.holographicdisplays.api.Hologram;
-import com.gmail.filoghost.holographicdisplays.api.HologramsAPI;
 import com.runicrealms.plugin.api.RunicNpcsAPI;
 import com.runicrealms.plugin.config.ConfigUtil;
 import com.runicrealms.plugin.grid.GridBounds;
 import com.runicrealms.plugin.grid.MultiWorldGrid;
 import com.runicrealms.plugin.listener.ScoreboardHandler;
-import net.minecraft.server.v1_16_R3.EntityPlayer;
+import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
+import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -46,9 +46,9 @@ public class NpcHandler implements Listener, RunicNpcsAPI {
     public Npc createNpc(Location location, String name, NpcTag npcTag, String skinId, boolean shown) {
         Skin skin = MineskinUtil.getMineskinSkin(skinId);
         if (skin != null) {
-            Hologram hologram = HologramsAPI.createHologram(RunicNpcs.getInstance(), new Location(location.getWorld(), location.getX(), location.getY() + RunicNpcs.HOLOGRAM_VERTICAL_OFFSET, location.getZ()));
-            hologram.appendTextLine(ChatColor.translateAlternateColorCodes('&', "&e" + name.replaceAll("_", " ")));
-            hologram.appendTextLine(npcTag.getChatColor() + npcTag.getIdentifier());
+            Hologram hologram = HolographicDisplaysAPI.get(RunicNpcs.getInstance()).createHologram(new Location(location.getWorld(), location.getX(), location.getY() + RunicNpcs.HOLOGRAM_VERTICAL_OFFSET, location.getZ()));
+            hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', "&e" + name.replaceAll("_", " ")));
+            hologram.getLines().appendText(npcTag.getChatColor() + npcTag.getIdentifier());
             Integer id = RunicNpcs.getNextId();
             Npc npc = new Npc(location, skin, id, hologram, UUID.randomUUID(), shown);
             ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
@@ -104,8 +104,8 @@ public class NpcHandler implements Listener, RunicNpcsAPI {
     }
 
     @Override
-    public boolean isNpc(EntityPlayer entityPlayer) {
-        return RunicNpcs.getNpcEntities().containsKey(entityPlayer.getId());
+    public boolean isNpc(Entity entity) {
+        return RunicNpcs.getNpcEntities().containsKey(entity.getEntityId());
     }
 
     @Override
