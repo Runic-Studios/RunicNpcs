@@ -15,10 +15,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scoreboard.Scoreboard;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ScoreboardHandler implements Listener {
 
@@ -41,32 +38,17 @@ public class ScoreboardHandler implements Listener {
     }
 
     public static void sendScoreboardPackets(Player player) {
-        PacketContainer createTeamPacket = createCreateTeamPacket();
-        PacketContainer addPlayersPacket = createAddPlayersPacket();
-
-        ProtocolLibrary.getProtocolManager().sendServerPacket(player, createTeamPacket);
-        ProtocolLibrary.getProtocolManager().sendServerPacket(player, addPlayersPacket);
+        //((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(team, 0));
+        //((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(team, NPC_NAMES, 3));
+        PacketContainer teamPacket = new PacketContainer(PacketType.Play.Server.SCOREBOARD_TEAM);
+        teamPacket.getStrings().write(0, teamName);
+        teamPacket.getIntegers().write(0, 0);
+        teamPacket.getSpecificModifier(Collection.class).write(0, NPC_NAMES);
+        ProtocolLibrary.getProtocolManager().sendServerPacket(player, teamPacket);
     }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         sendScoreboardPackets(event.getPlayer());
-    }
-
-    private static PacketContainer createCreateTeamPacket() {
-        PacketContainer scoreboardTeamPacket = new PacketContainer(PacketType.Play.Server.SCOREBOARD_TEAM);
-        scoreboardTeamPacket.getStrings().write(0, teamName);
-        return scoreboardTeamPacket;
-    }
-
-    private static PacketContainer createAddPlayersPacket() {
-        PacketContainer scoreboardTeamPacket = new PacketContainer(PacketType.Play.Server.SCOREBOARD_TEAM);
-
-        scoreboardTeamPacket.getStrings().write(0, teamName);
-        StructureModifier<Collection<String>> modifier = scoreboardTeamPacket.getModifier().withType(Collection.class);
-        modifier.write(0, NPC_NAMES);
-        scoreboardTeamPacket.getIntegers().write(0, 3); // PackOption 3 represents creating a new team
-
-        return scoreboardTeamPacket;
     }
 }
