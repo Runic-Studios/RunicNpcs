@@ -21,18 +21,21 @@ public class Npc {
     private final UUID uuid;
     private Skin skin;
     private Location newLocation = null; // Changes when we move an NPC to be saved on restart
+    private String label, name;
 
     private boolean shown;
 
-    public Npc(Location location, Skin skin, Integer id, Hologram hologram, UUID uuid, boolean shown) {
+    public Npc(Integer id, Location location, String label, String name, UUID uuid, Skin skin, Hologram hologram, boolean shown) {
         this.id = id;
-        this.skin = skin;
-        this.uuid = uuid;
-        this.gameProfile = new WrappedGameProfile(uuid, "npc_" + id);
         this.location = location;
+        this.label = label;
+        this.name = name;
+        this.uuid = uuid;
+        this.skin = skin;
         this.hologram = hologram;
         this.shown = shown;
 
+        this.gameProfile = new WrappedGameProfile(uuid, "npc_" + id);
         this.gameProfile.getProperties().put("textures", new WrappedSignedProperty("textures", this.skin.getTexture(), this.skin.getSignature()));
     }
 
@@ -64,12 +67,11 @@ public class Npc {
      * @return the label of the Npc "Merchant," "Quest," etc.
      */
     public String getLabel() {
-        return this.hologram.getLines().get(1).toString();
+        return this.label;
     }
 
     public void setLabel(String label) {
-        this.hologram.getLines().remove(1);
-        this.hologram.getLines().insertText(1, label);
+        this.label = label;
     }
 
     public Location getLocation() {
@@ -77,12 +79,11 @@ public class Npc {
     }
 
     public String getName() {
-        return this.hologram.getLines().get(0).toString();
+        return this.name;
     }
 
     public void setName(String name) {
-        this.hologram.getLines().remove(0);
-        this.hologram.getLines().insertText(0, name);
+        this.name = name;
     }
 
     public Location getNewLocation() {
@@ -128,7 +129,7 @@ public class Npc {
     public void spawnForPlayer(Player player) {
         PacketContainer infoPacket = new PacketContainer(PacketType.Play.Server.PLAYER_INFO);
         infoPacket.getPlayerInfoActions().write(0, EnumSet.of(EnumWrappers.PlayerInfoAction.ADD_PLAYER));
-        PlayerInfoData data = new PlayerInfoData(this.uuid, 0, false, EnumWrappers.NativeGameMode.NOT_SET, this.gameProfile, WrappedChatComponent.fromText(this.getName()));
+        PlayerInfoData data = new PlayerInfoData(this.uuid, 0, false, EnumWrappers.NativeGameMode.CREATIVE, this.gameProfile, WrappedChatComponent.fromText(this.getName()));
         infoPacket.getPlayerInfoDataLists().write(1, Collections.singletonList(data));
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, infoPacket);
 
@@ -142,12 +143,8 @@ public class Npc {
         spawnPacket.getBytes().write(1, (byte) (this.location.getPitch() * 256.0F / 360.0F));
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, spawnPacket);
 
-        //this.watcher.setObject(new WrappedDataWatcher.WrappedDataWatcherObject(16, WrappedDataWatcher.Registry.get(Byte.class)), (byte) 127);
-        //No Gravity Flag
-        //Health: 1F
-        //TODO: this.entityPlayer.getBukkitEntity().setMetadata("NPC", new FixedMetadataValue(RunicNpcs.getInstance(), true));
+        // TODO: remember to remove npc name via packet
         PacketContainer metadataPacket = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
-        metadataPacket.getIntegers().write(0, this.getEntityId());
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, metadataPacket);
 
         rotateHeadForPlayer(player);

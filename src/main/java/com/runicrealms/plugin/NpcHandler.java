@@ -43,14 +43,13 @@ public class NpcHandler implements Listener, RunicNpcsAPI {
     }
 
     @Override
-    public Npc createNpc(Location location, String name, NpcTag npcTag, String skinId, boolean shown) {
-        Skin skin = MineskinUtil.getMineskinSkin(skinId);
+    public Npc createNpc(Location location, String name, NpcTag npcTag, Skin skin, boolean shown) {
         if (skin != null) {
             Hologram hologram = HolographicDisplaysAPI.get(RunicNpcs.getInstance()).createHologram(new Location(location.getWorld(), location.getX(), location.getY() + RunicNpcs.HOLOGRAM_VERTICAL_OFFSET, location.getZ()));
             hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', "&e" + name.replaceAll("_", " ")));
             hologram.getLines().appendText(npcTag.getChatColor() + npcTag.getIdentifier());
             Integer id = RunicNpcs.getNextId();
-            Npc npc = new Npc(location, skin, id, hologram, UUID.randomUUID(), shown);
+            Npc npc = new Npc(id, location, npcTag.getChatColor() + npcTag.getIdentifier(), name, UUID.randomUUID(), skin, hologram, shown);
             ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
             RunicNpcs.getNpcs().put(npc.getId(), npc);
             RunicNpcs.getNpcEntities().put(npc.getEntityId(), npc);

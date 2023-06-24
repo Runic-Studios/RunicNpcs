@@ -14,6 +14,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
 import java.util.*;
 
@@ -40,11 +41,7 @@ public class ScoreboardHandler implements Listener {
     public static void sendScoreboardPackets(Player player) {
         //((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(team, 0));
         //((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(team, NPC_NAMES, 3));
-        PacketContainer teamPacket = new PacketContainer(PacketType.Play.Server.SCOREBOARD_TEAM);
-        teamPacket.getStrings().write(0, teamName);
-        teamPacket.getIntegers().write(0, 0);
-        teamPacket.getSpecificModifier(Collection.class).write(0, NPC_NAMES);
-        ProtocolLibrary.getProtocolManager().sendServerPacket(player, teamPacket);
+        // keeping for legacy purposes, may need to re-enact if packets don't work as expected
     }
 
     @EventHandler

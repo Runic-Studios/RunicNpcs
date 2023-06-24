@@ -48,9 +48,9 @@ public class ConfigUtil {
                         Double.parseDouble(npcsSection.getString(key + ".hologram.x")),
                         Double.parseDouble(npcsSection.getString(key + ".hologram.y")),
                         Double.parseDouble(npcsSection.getString(key + ".hologram.z"))));
-                hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', "&e" + npcsSection.getString(key + ".hologram.name")));
+                hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', "&e" + npcsSection.getString(key + ".name")));
                 String color = "";
-                String colored = ChatColor.translateAlternateColorCodes('&', npcsSection.getString(key + ".hologram.label"));
+                String colored = ChatColor.translateAlternateColorCodes('&', npcsSection.getString(key + ".label"));
                 if (ChatColor.stripColor(colored).equalsIgnoreCase(colored)) {
                     if (colored.equalsIgnoreCase("Merchant")) {
                         color = "&a";
@@ -60,8 +60,9 @@ public class ConfigUtil {
                         color = "&7";
                     }
                 }
-                hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', color + npcsSection.getString(key + ".hologram.label")));
+                hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', color + npcsSection.getString(key + ".label")));
                 Npc npc = new Npc(
+                        Integer.parseInt(key),
                         new Location(
                                 Bukkit.getWorld(npcsSection.getString(key + ".location.world")),
                                 Double.parseDouble(npcsSection.getString(key + ".location.x")),
@@ -69,10 +70,11 @@ public class ConfigUtil {
                                 Double.parseDouble(npcsSection.getString(key + ".location.z")),
                                 Float.parseFloat(npcsSection.getString(key + ".location.yaw")),
                                 Float.parseFloat(npcsSection.getString(key + ".location.pitch"))),
-                        new Skin(npcsSection.getString(key + ".skin-texture"), npcsSection.getString(key + ".skin-signature")),
-                        Integer.parseInt(key),
-                        hologram,
+                        hologram.getLines().get(1).toString(),
+                        hologram.getLines().get(0).toString(),
                         UUID.randomUUID(),
+                        new Skin(npcsSection.getString(key + ".skin-texture"), npcsSection.getString(key + ".skin-signature")),
+                        hologram,
                         !npcsSection.contains(key + ".shown") || npcsSection.getBoolean(key + ".shown"));
                 npcs.put(Integer.parseInt(key), npc);
             }
@@ -112,8 +114,8 @@ public class ConfigUtil {
             config.set("npcs." + npc.getId() + ".hologram.x", hologramLocation.getX());
             config.set("npcs." + npc.getId() + ".hologram.y", hologramLocation.getY());
             config.set("npcs." + npc.getId() + ".hologram.z", hologramLocation.getZ());
-            config.set("npcs." + npc.getId() + ".hologram.name", ChatColor.stripColor(((TextHologramLine) npc.getHologram().getLines().get(0)).getText()));
-            config.set("npcs." + npc.getId() + ".hologram.label", ChatColor.stripColor(((TextHologramLine) npc.getHologram().getLines().get(1)).getText()));
+            config.set("npcs." + npc.getId() + ".name", npc.getName());
+            config.set("npcs." + npc.getId() + ".label", npc.getLabel());
             config.set("npcs." + npc.getId() + ".location.world", location.getWorld().getName());
             config.set("npcs." + npc.getId() + ".location.x", location.getX());
             config.set("npcs." + npc.getId() + ".location.y", location.getY());

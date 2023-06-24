@@ -89,28 +89,23 @@ public class RunicNpcCommand extends BaseCommand {
         Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
             Skin skin = MineskinUtil.getMineskinSkin(args[2]);
             if (skin != null) {
-                Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
-                    Location npcLocation = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getY(), player.getLocation().getBlockZ() + 0.5, player.getLocation().getYaw(), player.getLocation().getPitch());
-                    Hologram hologram = HolographicDisplaysAPI.get(RunicNpcs.getInstance()).createHologram(new Location(npcLocation.getWorld(), npcLocation.getX(), npcLocation.getY() + RunicNpcs.HOLOGRAM_VERTICAL_OFFSET, npcLocation.getZ()));
-                    hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', "&e" + args[0].replaceAll("_", " ")));
-                    NpcTag npcTag = NpcTag.getFromIdentifier(args[1]);
-                    if (npcTag == null) {
-                        player.sendMessage(ChatColor.YELLOW + "Error, NPC tag was not a valid value");
-                        return;
-                    }
-                    hologram.getLines().appendText(npcTag.getChatColor() + npcTag.getIdentifier());
-                    Integer id = RunicNpcs.getNextId();
-                    Npc npc = new Npc(npcLocation, skin, id, hologram, UUID.randomUUID(), true);
-                    ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
-                    RunicNpcs.getNpcs().put(npc.getId(), npc);
-                    RunicNpcs.getNpcEntities().put(npc.getEntityId(), npc);
-                    RunicNpcs.getAPI().createNpcForPlayers(npc);
-                    RunicNpcs.getAPI().placeNpcInGrid(npc);
-                    ScoreboardHandler.addNpcName(npc);
-                    RunicNpcs.updateNpcs();
-                    ScoreboardHandler.sendScoreboardPackets(player);
-                    sendMessage(player, "&aCreated NPC. ID is " + id + ".");
-                });
+                Integer id = RunicNpcs.getNextId();
+                String name = args[0];
+                Location npcLocation = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getY(), player.getLocation().getBlockZ() + 0.5, player.getLocation().getYaw(), player.getLocation().getPitch());
+                Hologram hologram = HolographicDisplaysAPI.get(RunicNpcs.getInstance()).createHologram(new Location(npcLocation.getWorld(), npcLocation.getX(), npcLocation.getY() + RunicNpcs.HOLOGRAM_VERTICAL_OFFSET, npcLocation.getZ()));
+
+                NpcTag npcTag = NpcTag.getFromIdentifier(args[1]);
+                if (npcTag == null) {
+                    player.sendMessage(ChatColor.YELLOW + "Error, NPC tag was not a valid value");
+                    return;
+                }
+
+                hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', "&e" + args[0].replaceAll("_", " ")));
+                hologram.getLines().appendText(npcTag.getChatColor() + npcTag.getIdentifier());
+
+                RunicNpcs.getAPI().createNpc(npcLocation, name, npcTag, skin, true);
+
+                sendMessage(player, "&aCreated NPC. ID is " + id + ".");
             } else {
                 sendMessage(player, "&cSkin invalid.");
             }
@@ -124,16 +119,9 @@ public class RunicNpcCommand extends BaseCommand {
     public void onDeleteCommand(Player player, String[] args) {
         if (args.length == 1) {
             if (isInt(args[0])) {
-                if (RunicNpcs.getNpcs().containsKey(Integer.parseInt(args[0]))) {
-                    Npc npc = RunicNpcs.getNpcs().get(Integer.parseInt(args[0]));
-                    RunicNpcs.getNpcs().remove(Integer.parseInt(args[0]));
-                    RunicNpcs.getNpcEntities().remove(npc.getEntityId());
-                    RunicNpcs.getAPI().removeNpcForPlayers(npc);
-                    RunicNpcs.getAPI().removeNpcFromGrid(npc);
-                    ScoreboardHandler.removeNpcName(npc);
-                    npc.delete(true);
-                    RunicNpcs.updateNpcs();
-                    ConfigUtil.deleteNpc(Integer.parseInt(args[0]), RunicNpcs.getFileConfig());
+                int id = Integer.parseInt(args[0]);
+                if (RunicNpcs.getNpcs().containsKey(id)) {
+                    RunicNpcs.getAPI().deleteNpc(id);
                     sendMessage(player, "&aSuccessfully removed NPC!");
                 } else {
                     sendMessage(player, "&cThere is no NPC with that ID!");
@@ -207,19 +195,21 @@ public class RunicNpcCommand extends BaseCommand {
     @Conditions("is-op")
     public void onRenameCommand(Player player, String[] args) {
         if (args.length == 2) {
-            Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
                 if (args[1] != null) {
                     String name = args[1].replaceAll("_", " ");
+                    Npc npc = RunicNpcs.getNpcs().get(Integer.valueOf(args[0]));
                     Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
-                        Npc npc = RunicNpcs.getNpcs().get(Integer.valueOf(args[0]));
                         npc.setName(name);
                         ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
                         sendMessage(player, "&aNPC name updated!");
                     });
+
+                    npc.getHologram().getLines().remove(0);
+                    npc.getHologram().getLines().insertText(0, name);
+
                 } else {
                     sendMessage(player, "&cCommand returned invalid.");
                 }
-            });
         } else {
             sendHelpMessage(player);
         }
@@ -255,23 +245,25 @@ public class RunicNpcCommand extends BaseCommand {
     @Conditions("is-op")
     public void onTagCommand(Player player, String[] args) {
         if (args.length == 2) {
-            Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
                 if (args[1] != null) {
                     NpcTag npcTag = NpcTag.getFromIdentifier(args[1]);
                     if (npcTag == null) {
                         sendMessage(player, "&cPlease enter a valid tag");
                         return;
                     }
-                    Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
-                        Npc npc = RunicNpcs.getNpcs().get(Integer.valueOf(args[0]));
+                    Npc npc = RunicNpcs.getNpcs().get(Integer.valueOf(args[0]));
+                    Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
                         npc.setLabel(npcTag.getChatColor() + npcTag.getIdentifier());
                         ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
                         sendMessage(player, "&aNPC tag updated!");
                     });
+                    // Update the Hologram
+                    npc.getHologram().getLines().remove(1);
+                    npc.getHologram().getLines().insertText(1, npcTag.getChatColor() + npcTag.getIdentifier());
+
                 } else {
                     sendMessage(player, "&cCommand returned invalid.");
                 }
-            });
         } else {
             sendHelpMessage(player);
         }
