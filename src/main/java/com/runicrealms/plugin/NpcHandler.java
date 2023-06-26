@@ -49,13 +49,12 @@ public class NpcHandler implements Listener, RunicNpcsAPI {
             hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', "&e" + name.replaceAll("_", " ")));
             hologram.getLines().appendText(npcTag.getChatColor() + npcTag.getIdentifier());
             Integer id = RunicNpcs.getNextId();
-            Npc npc = new Npc(id, location, npcTag.getChatColor() + npcTag.getIdentifier(), name, UUID.randomUUID(), skin, hologram, shown);
+            Npc npc = new Npc(id, location, npcTag.toString(), name, UUID.randomUUID(), skin, hologram, shown);
             ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
             RunicNpcs.getNpcs().put(npc.getId(), npc);
             RunicNpcs.getNpcEntities().put(npc.getEntityId(), npc);
             this.createNpcForPlayers(npc);
             this.placeNpcInGrid(npc);
-            ScoreboardHandler.addNpcName(npc);
             RunicNpcs.updateNpcs();
             Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(ScoreboardHandler::sendScoreboardPackets));
             return npc;
@@ -78,7 +77,6 @@ public class NpcHandler implements Listener, RunicNpcsAPI {
             RunicNpcs.getNpcEntities().remove(npc.getEntityId());
             this.removeNpcForPlayers(npc);
             this.removeNpcFromGrid(npc);
-            ScoreboardHandler.removeNpcName(npc);
             npc.delete(true);
             RunicNpcs.updateNpcs();
             ConfigUtil.deleteNpc(id, RunicNpcs.getFileConfig());
@@ -103,9 +101,7 @@ public class NpcHandler implements Listener, RunicNpcsAPI {
     }
 
     @Override
-    public boolean isNpc(Entity entity) {
-        return RunicNpcs.getNpcEntities().containsKey(entity.getEntityId());
-    }
+    public boolean isNpc(Entity entity) { return RunicNpcs.getNpcEntities().containsKey(entity.getEntityId()); }
 
     @Override
     public void placeNpcInGrid(Npc npc) {

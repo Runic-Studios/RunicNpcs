@@ -145,9 +145,12 @@ public class Npc {
 
         // TODO: remember to remove npc name via packet
         PacketContainer metadataPacket = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
+        metadataPacket.getIntegers().write(0, this.getEntityId());
+
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, metadataPacket);
 
         rotateHeadForPlayer(player);
+
     }
 
 }
