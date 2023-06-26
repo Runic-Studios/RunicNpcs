@@ -1,9 +1,9 @@
 package com.runicrealms.plugin;
 
 import com.runicrealms.plugin.api.RunicNpcsAPI;
+import com.runicrealms.plugin.common.util.grid.GridBounds;
+import com.runicrealms.plugin.common.util.grid.MultiWorldGrid;
 import com.runicrealms.plugin.config.ConfigUtil;
-import com.runicrealms.plugin.grid.GridBounds;
-import com.runicrealms.plugin.grid.MultiWorldGrid;
 import com.runicrealms.plugin.listener.ScoreboardHandler;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
