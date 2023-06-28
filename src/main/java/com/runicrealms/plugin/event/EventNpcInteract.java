@@ -31,7 +31,7 @@ public class EventNpcInteract implements Listener {
     private final Set<UUID> npcTalkers = new HashSet<>();
 
     public EventNpcInteract() {
-        RunicNpcs.getProtocolManager().addPacketListener(new PacketAdapter(RunicNpcs.getInstance(), ListenerPriority.NORMAL, PacketType.Play.Client.USE_ENTITY) {
+        RunicNpcs.getProtocolManager().getAsynchronousManager().registerAsyncHandler(new PacketAdapter(RunicNpcs.getInstance(), ListenerPriority.NORMAL, PacketType.Play.Client.USE_ENTITY) {
             @Override
             public void onPacketReceiving(PacketEvent event) {
                 if (event.getPacketType() == PacketType.Play.Client.USE_ENTITY) {
