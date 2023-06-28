@@ -3,13 +3,20 @@ package com.runicrealms.plugin;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.*;
+import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.comphenix.protocol.wrappers.PlayerInfoData;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
+import com.comphenix.protocol.wrappers.WrappedGameProfile;
+import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.UUID;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Npc {
@@ -47,7 +54,9 @@ public class Npc {
 
     public void despawnForPlayer(Player player) {
         PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_DESTROY);
-        packet.getIntLists().write(0, new ArrayList<>() {{this.add(getEntityId());}});
+        packet.getIntLists().write(0, new ArrayList<>() {{
+            this.add(getEntityId());
+        }});
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
     }
 
@@ -122,7 +131,7 @@ public class Npc {
     public void rotateHeadForPlayer(Player player) {
         PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_HEAD_ROTATION);
         packet.getIntegers().write(0, this.getEntityId());
-        packet.getBytes().write(0, (byte) ((this.location.getYaw()  * 256.0F) / 360F));
+        packet.getBytes().write(0, (byte) ((this.location.getYaw() * 256.0F) / 360F));
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
     }
 
