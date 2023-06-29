@@ -49,7 +49,7 @@ public class EventNpcInteract implements Listener {
                             () -> Bukkit.getServer().getPluginManager().callEvent(new NpcClickEvent(npc, event.getPlayer())));
                 }
             }
-        });
+        }).start();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
