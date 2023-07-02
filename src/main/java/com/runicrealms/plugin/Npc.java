@@ -3,20 +3,14 @@ package com.runicrealms.plugin;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.comphenix.protocol.wrappers.PlayerInfoData;
-import com.comphenix.protocol.wrappers.WrappedChatComponent;
-import com.comphenix.protocol.wrappers.WrappedGameProfile;
-import com.comphenix.protocol.wrappers.WrappedSignedProperty;
+import com.comphenix.protocol.wrappers.*;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.UUID;
+import java.util.*;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Npc {
@@ -63,6 +57,7 @@ public class Npc {
     public Integer getEntityId() {
         return 9000 + this.getId();
     }
+    public String getEntityName() { return this.gameProfile.getName();}
 
     public Hologram getHologram() {
         return this.hologram;
@@ -138,7 +133,7 @@ public class Npc {
     public void spawnForPlayer(Player player) {
         PacketContainer infoPacket = new PacketContainer(PacketType.Play.Server.PLAYER_INFO);
         infoPacket.getPlayerInfoActions().write(0, EnumSet.of(EnumWrappers.PlayerInfoAction.ADD_PLAYER));
-        PlayerInfoData data = new PlayerInfoData(this.uuid, 0, false, EnumWrappers.NativeGameMode.CREATIVE, this.gameProfile, WrappedChatComponent.fromText(this.getName()));
+        PlayerInfoData data = new PlayerInfoData(this.uuid, 0, false, EnumWrappers.NativeGameMode.SURVIVAL, this.gameProfile, null);
         infoPacket.getPlayerInfoDataLists().write(1, Collections.singletonList(data));
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, infoPacket);
 
@@ -155,10 +150,12 @@ public class Npc {
         // TODO: remember to remove npc name via packet
         PacketContainer metadataPacket = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
         metadataPacket.getIntegers().write(0, this.getEntityId());
+        List<WrappedDataValue> dataValues = new ArrayList<>();
+        dataValues.add(new WrappedDataValue(17, WrappedDataWatcher.Registry.get(Byte.class), (byte) 0xFF));
+        metadataPacket.getDataValueCollectionModifier().write(0, dataValues);
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, metadataPacket);
 
         rotateHeadForPlayer(player);
-
     }
 
 }

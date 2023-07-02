@@ -56,7 +56,7 @@ public class NpcHandler implements Listener, RunicNpcsAPI {
             this.createNpcForPlayers(npc);
             this.placeNpcInGrid(npc);
             RunicNpcs.updateNpcs();
-            Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(ScoreboardHandler::sendScoreboardPackets));
+            Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> Bukkit.getOnlinePlayers().forEach(ScoreboardHandler::updateScoreboard));
             return npc;
         } else {
             throw new IllegalArgumentException("Invalid skin ID!");

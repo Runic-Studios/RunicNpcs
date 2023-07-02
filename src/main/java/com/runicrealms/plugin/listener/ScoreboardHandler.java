@@ -1,44 +1,42 @@
 package com.runicrealms.plugin.listener;
 
+import com.comphenix.protocol.PacketType;
+import com.comphenix.protocol.ProtocolLib;
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.events.PacketContainer;
+import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.runicrealms.plugin.Npc;
 import com.runicrealms.plugin.RunicNpcs;
+import com.runicrealms.plugin.rdb.event.CharacterLoadedEvent;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.scoreboard.Scoreboard;
+import org.bukkit.scoreboard.Team;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class ScoreboardHandler implements Listener {
 
-    private static final List<String> NPC_NAMES = new ArrayList<>();
-    private static String teamName;
+        public static void updateScoreboard(Player player) {
+            Team team;
+            if ((team = player.getScoreboard().getTeam("npcs")) != null) {
+                team.unregister();
+            }
 
-    public static void initScoreboard() {
-        for (Map.Entry<Integer, Npc> entry : RunicNpcs.getNpcs().entrySet()) {
-            NPC_NAMES.add(entry.getValue().getName());
+            team = player.getScoreboard().registerNewTeam("npcs");
+            team.setOption(Team.Option.NAME_TAG_VISIBILITY, Team.OptionStatus.NEVER);
+            for(Npc npc : RunicNpcs.getNpcs().values()) { team.addEntry(npc.getEntityName()); }
         }
-        teamName = "npcs";
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onJoin(CharacterLoadedEvent event) {
+            updateScoreboard(event.getPlayer());
     }
 
-    public static void addNpcName(Npc npc) {
-        NPC_NAMES.add(npc.getName());
-    }
-
-    public static void removeNpcName(Npc npc) {
-        NPC_NAMES.remove(npc.getName());
-    }
-
-    public static void sendScoreboardPackets(Player player) {
-        //((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(team, 0));
-        //((CraftPlayer) player).getHandle().playerConnection.sendPacket(new PacketPlayOutScoreboardTeam(team, NPC_NAMES, 3));
-        // keeping for legacy purposes, may need to re-enact if packets don't work as expected
-    }
-
-    @EventHandler
-    public void onJoin(PlayerJoinEvent event) {
-        sendScoreboardPackets(event.getPlayer());
-    }
 }

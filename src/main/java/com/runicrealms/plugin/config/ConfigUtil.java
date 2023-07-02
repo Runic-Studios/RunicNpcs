@@ -3,6 +3,7 @@ package com.runicrealms.plugin.config;
 import com.runicrealms.plugin.Npc;
 import com.runicrealms.plugin.RunicNpcs;
 import com.runicrealms.plugin.Skin;
+import com.runicrealms.plugin.listener.ScoreboardHandler;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import me.filoghost.holographicdisplays.api.hologram.line.TextHologramLine;
@@ -70,8 +71,8 @@ public class ConfigUtil {
                                 Double.parseDouble(npcsSection.getString(key + ".location.z")),
                                 Float.parseFloat(npcsSection.getString(key + ".location.yaw")),
                                 Float.parseFloat(npcsSection.getString(key + ".location.pitch"))),
-                        hologram.getLines().get(1).toString(),
-                        hologram.getLines().get(0).toString(),
+                        npcsSection.getString(key + ".label"),
+                        npcsSection.getString(key + ".name"),
                         UUID.randomUUID(),
                         new Skin(npcsSection.getString(key + ".skin-texture"), npcsSection.getString(key + ".skin-signature")),
                         hologram,

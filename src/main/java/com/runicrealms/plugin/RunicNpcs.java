@@ -131,7 +131,6 @@ public class RunicNpcs extends JavaPlugin {
             Bukkit.getScheduler().runTask(instance, () -> {
                 ConfigUtil.loadNpcs(config);
                 for (Npc npc : npcs.values()) npcEntityUUIDs.add(npc.getUuid());
-                ScoreboardHandler.initScoreboard();
                 RunicRestart.getAPI().markPluginLoaded("npcs");
                 Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
                     for (Player player : Bukkit.getOnlinePlayers()) {
