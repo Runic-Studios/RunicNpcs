@@ -12,16 +12,7 @@ import com.runicrealms.plugin.Npc;
 import com.runicrealms.plugin.RunicNpcs;
 import com.runicrealms.plugin.api.NpcClickEvent;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.event.Event;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.EquipmentSlot;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * Handles the creation of our custom NpcClickEvent
@@ -30,7 +21,6 @@ import java.util.UUID;
  */
 public class EventNpcInteract implements Listener {
     private static AsyncListenerHandler asyncListener;
-    private final Set<UUID> npcTalkers = new HashSet<>();
 
     public EventNpcInteract() {
         asyncListener = RunicNpcs.getProtocolManager().getAsynchronousManager().registerAsyncHandler(new PacketAdapter(RunicNpcs.getInstance(), ListenerPriority.NORMAL, PacketType.Play.Client.USE_ENTITY) {
@@ -50,13 +40,7 @@ public class EventNpcInteract implements Listener {
                             if (npc == null) return;
                             Bukkit.getScheduler().scheduleSyncDelayedTask(RunicNpcs.getInstance(),
                                 () -> {
-                                    NpcClickEvent npcClickEvent = new NpcClickEvent(npc, event.getPlayer());
-                                    Bukkit.getServer().getPluginManager().callEvent(npcClickEvent);
-                                    if(!npcClickEvent.isCancelled()) {
-                                        if (event.getPlayer().getInventory().getItemInMainHand().getType() != Material.AIR) {
-                                            npcTalkers.add(event.getPlayer().getUniqueId());
-                                        }
-                                    }
+                                    Bukkit.getServer().getPluginManager().callEvent(new NpcClickEvent(npc, event.getPlayer()));
                             });
                     }
                 }
@@ -69,15 +53,4 @@ public class EventNpcInteract implements Listener {
     public static void stopTask() {
         asyncListener.stop();
     }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getHand() != EquipmentSlot.HAND) return;
-        if (npcTalkers.contains(event.getPlayer().getUniqueId())) {
-            event.setUseInteractedBlock(Event.Result.DENY);
-            event.setUseItemInHand(Event.Result.DENY);
-            npcTalkers.remove(event.getPlayer().getUniqueId());
-        }
-    }
-
 }
