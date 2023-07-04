@@ -36,7 +36,7 @@ public class NpcHandler implements Listener, RunicNpcsAPI {
         Bukkit.getScheduler().runTaskTimerAsynchronously(RunicNpcs.getInstance(), () -> {
             for (Player player : LOADED_NPCS.keySet()) {
                 for (Npc npc : LOADED_NPCS.get(player).keySet()) {
-                    npc.rotateHeadForPlayer(player);
+                    npc.rotateHeadForPlayer(player, npc.getLocation());
                 }
             }
         }, 100L, 100L);

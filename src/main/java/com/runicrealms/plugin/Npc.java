@@ -5,12 +5,18 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.*;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
+import me.filoghost.holographicdisplays.api.hologram.VisibilitySettings;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.jetbrains.annotations.ApiStatus;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.UUID;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Npc {
@@ -123,10 +129,83 @@ public class Npc {
         RunicNpcs.updateNpcs();
     }
 
-    public void rotateHeadForPlayer(Player player) {
+    /*
+        Experimental Methods - IN TESTING DO NOT USE
+    */
+    @Deprecated
+    public void moveEntityForPlayer(Player player, double x, double y, double z) {
+        this.hologram.getVisibilitySettings().setIndividualVisibility(player, VisibilitySettings.Visibility.HIDDEN);
+            new BukkitRunnable() {
+                double curX = Npc.this.getLocation().getX();
+                double curY = Npc.this.getLocation().getY();
+                double curZ = Npc.this.getLocation().getZ();
+
+                @Override
+                public void run() {
+                    if ((Math.abs(curX - x) < 0.1) && (Math.abs(curY - y) < 0.1) && (Math.abs(curZ - z) < 0.1)) {
+                       // Npc.this.hologram.setPosition(new Location(Bukkit.getWorld("Alterra"), x,y + 2.5,z));
+                       // Npc.this.hologram.getVisibilitySettings().setIndividualVisibility(player, VisibilitySettings.Visibility.VISIBLE);
+                        this.cancel();
+                        return;
+                    }
+
+                    if (curX < x) curX += 0.1;
+                    if (curY < y) curY += 0.1;
+                    if (curZ < z) curZ += 0.1;
+
+                    if (curX > x) curX -= 0.1;
+                    if (curY > y) curY -= 0.1;
+                    if (curZ > z) curZ -= 0.1;
+
+                    PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_TELEPORT);
+                    packet.getIntegers().write(0, Npc.this.getEntityId());
+                    packet.getDoubles().write(0, curX);
+                    packet.getDoubles().write(1, curY);
+                    packet.getDoubles().write(2, curZ);
+                    packet.getBytes().write(0, (byte) ((int) Npc.this.getLocation().getYaw() * 256.0F / 360.0F));
+                    packet.getBytes().write(1, (byte) ((int) Npc.this.getLocation().getPitch() * 256.0F / 360.0F));
+                    packet.getBooleans().write(0, false);
+                    ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
+                    lookAtForPlayer(player, x, y, z);
+                }
+            }.runTaskTimer(RunicNpcs.getInstance(), 0L, 1L);
+
+    }
+
+    /*
+        Experimental Methods - IN TESTING DO NOT USE
+    */
+    @Deprecated
+    public void lookAtForPlayer(Player player, double x, double y, double z) {
+        float[] rotations = getRotation(new Location(this.getLocation().getWorld(), x, y, z));
+
         PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_HEAD_ROTATION);
         packet.getIntegers().write(0, this.getEntityId());
-        packet.getBytes().write(0, (byte) ((this.location.getYaw() * 256.0F) / 360F));
+        packet.getBytes().write(0, (byte) (rotations[0] * 256.0F / 360.0F));
+        ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
+    }
+
+    /*
+        Experimental Methods - IN TESTING DO NOT USE
+    */
+    @Deprecated
+    private float[] getRotation(Location target) {
+        double dx = target.getX() - Npc.this.getLocation().getX();
+        double dy = target.getY() - Npc.this.getLocation().getY();
+        double dz = target.getZ() - Npc.this.getLocation().getZ();
+
+        double distanceXZ = Math.sqrt(dx * dx + dz * dz);
+
+        double yaw = Math.toDegrees(Math.atan2(dz, dx)) - 90;
+        double pitch = -Math.toDegrees(Math.atan2(dy, distanceXZ));
+
+        return new float[]{(float) yaw, (float) pitch};
+    }
+
+    public void rotateHeadForPlayer(Player player, Location location) {
+        PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_HEAD_ROTATION);
+        packet.getIntegers().write(0, this.getEntityId());
+        packet.getBytes().write(0, (byte) ((location.getYaw() * 256.0F) / 360F));
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
     }
 
@@ -147,7 +226,6 @@ public class Npc {
         spawnPacket.getBytes().write(1, (byte) (this.location.getPitch() * 256.0F / 360.0F));
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, spawnPacket);
 
-        // TODO: remember to remove npc name via packet
         PacketContainer metadataPacket = new PacketContainer(PacketType.Play.Server.ENTITY_METADATA);
         metadataPacket.getIntegers().write(0, this.getEntityId());
         List<WrappedDataValue> dataValues = new ArrayList<>();
@@ -155,7 +233,7 @@ public class Npc {
         metadataPacket.getDataValueCollectionModifier().write(0, dataValues);
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, metadataPacket);
 
-        rotateHeadForPlayer(player);
+        rotateHeadForPlayer(player, this.location);
     }
 
 }

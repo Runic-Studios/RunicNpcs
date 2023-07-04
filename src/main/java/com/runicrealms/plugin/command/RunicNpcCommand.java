@@ -86,7 +86,7 @@ public class RunicNpcCommand extends BaseCommand {
             return;
         }
         sendMessage(player, "&aRetrieving skin data...");
-        Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
+        Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
             Skin skin = MineskinUtil.getMineskinSkin(args[2]);
             if (skin != null) {
                 Integer id = RunicNpcs.getNextId();

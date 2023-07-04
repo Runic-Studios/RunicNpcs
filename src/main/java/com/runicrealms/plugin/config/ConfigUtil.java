@@ -41,16 +41,18 @@ public class ConfigUtil {
         Map<Integer, Npc> npcs = new HashMap<>();
         if (config.contains("npcs")) {
             ConfigurationSection npcsSection = config.getConfigurationSection("npcs");
+
             for (String key : npcsSection.getKeys(false)) {
-                Hologram hologram = HolographicDisplaysAPI.get(RunicNpcs.getInstance()).createHologram(
-                        new Location(
-                                Bukkit.getWorld(npcsSection.getString(key + ".location.world")),
-                                Double.parseDouble(npcsSection.getString(key + ".location.x")),
-                                Double.parseDouble(npcsSection.getString(key + ".location.y")) + 2.5,
-                                Double.parseDouble(npcsSection.getString(key + ".location.z")),
-                                Float.parseFloat(npcsSection.getString(key + ".location.yaw")),
-                                Float.parseFloat(npcsSection.getString(key + ".location.pitch")))
+                Location location = new Location(
+                        Bukkit.getWorld(npcsSection.getString(key + ".location.world")),
+                        Double.parseDouble(npcsSection.getString(key + ".location.x")),
+                        Double.parseDouble(npcsSection.getString(key + ".location.y")),
+                        Double.parseDouble(npcsSection.getString(key + ".location.z")),
+                        Float.parseFloat(npcsSection.getString(key + ".location.yaw")),
+                        Float.parseFloat(npcsSection.getString(key + ".location.pitch"))
                 );
+
+                Hologram hologram = HolographicDisplaysAPI.get(RunicNpcs.getInstance()).createHologram(location.clone().add(0, 2.5, 0));
                 hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', "&e" + npcsSection.getString(key + ".name")));
                 String color = "";
                 String colored = ChatColor.translateAlternateColorCodes('&', npcsSection.getString(key + ".label"));
@@ -66,13 +68,7 @@ public class ConfigUtil {
                 hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', color + npcsSection.getString(key + ".label")));
                 Npc npc = new Npc(
                         Integer.parseInt(key),
-                        new Location(
-                                Bukkit.getWorld(npcsSection.getString(key + ".location.world")),
-                                Double.parseDouble(npcsSection.getString(key + ".location.x")),
-                                Double.parseDouble(npcsSection.getString(key + ".location.y")),
-                                Double.parseDouble(npcsSection.getString(key + ".location.z")),
-                                Float.parseFloat(npcsSection.getString(key + ".location.yaw")),
-                                Float.parseFloat(npcsSection.getString(key + ".location.pitch"))),
+                        location,
                         npcsSection.getString(key + ".label"),
                         npcsSection.getString(key + ".name"),
                         UUID.randomUUID(),
@@ -111,12 +107,7 @@ public class ConfigUtil {
      */
     public static void saveNpc(Npc npc, FileConfiguration config) {
         Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
-            config.set("npcs." + npc.getId() + ".hologram.world", npc.getHologram().getPosition().toLocation().getWorld().getName());
             Location location = npc.hasNewLocation() ? npc.getNewLocation() : npc.getLocation();
-            Location hologramLocation = npc.hasNewLocation() ? npc.getNewLocation().clone().add(0, RunicNpcs.HOLOGRAM_VERTICAL_OFFSET, 0) : npc.getHologram().getPosition().toLocation();
-            config.set("npcs." + npc.getId() + ".hologram.x", hologramLocation.getX());
-            config.set("npcs." + npc.getId() + ".hologram.y", hologramLocation.getY());
-            config.set("npcs." + npc.getId() + ".hologram.z", hologramLocation.getZ());
             config.set("npcs." + npc.getId() + ".name", npc.getName());
             config.set("npcs." + npc.getId() + ".label", npc.getLabel());
             config.set("npcs." + npc.getId() + ".location.world", location.getWorld().getName());
