@@ -89,7 +89,6 @@ public class RunicNpcCommand extends BaseCommand {
         Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
             Skin skin = MineskinUtil.getMineskinSkin(args[2]);
             if (skin != null) {
-                Integer id = RunicNpcs.getNextId();
                 String name = args[0];
                 Location npcLocation = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getY(), player.getLocation().getBlockZ() + 0.5, player.getLocation().getYaw(), player.getLocation().getPitch());
                 Hologram hologram = HolographicDisplaysAPI.get(RunicNpcs.getInstance()).createHologram(new Location(npcLocation.getWorld(), npcLocation.getX(), npcLocation.getY() + RunicNpcs.HOLOGRAM_VERTICAL_OFFSET, npcLocation.getZ()));
@@ -103,9 +102,9 @@ public class RunicNpcCommand extends BaseCommand {
                 hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', "&e" + args[0].replaceAll("_", " ")));
                 hologram.getLines().appendText(npcTag.getChatColor() + npcTag.getIdentifier());
 
-                RunicNpcs.getAPI().createNpc(npcLocation, name, npcTag, skin, true);
+                Npc npc = RunicNpcs.getAPI().createNpc(npcLocation, name, npcTag, skin, true);
 
-                sendMessage(player, "&aCreated NPC. ID is " + id + ".");
+                sendMessage(player, "&aCreated NPC. ID is " + npc.getId() + ".");
             } else {
                 sendMessage(player, "&cSkin invalid.");
             }
