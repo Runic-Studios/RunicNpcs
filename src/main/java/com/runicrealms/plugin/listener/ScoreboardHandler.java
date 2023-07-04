@@ -7,6 +7,7 @@ import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.wrappers.WrappedChatComponent;
 import com.runicrealms.plugin.Npc;
 import com.runicrealms.plugin.RunicNpcs;
+import com.runicrealms.plugin.api.NpcClickEvent;
 import com.runicrealms.plugin.rdb.event.CharacterLoadedEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -34,9 +35,8 @@ public class ScoreboardHandler implements Listener {
             for(Npc npc : RunicNpcs.getNpcs().values()) { team.addEntry(npc.getEntityName()); }
         }
 
-    @EventHandler(priority = EventPriority.MONITOR)
+    @EventHandler(priority = EventPriority.NORMAL)
     public void onJoin(CharacterLoadedEvent event) {
             updateScoreboard(event.getPlayer());
     }
-
 }
