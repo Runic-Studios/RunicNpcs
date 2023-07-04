@@ -106,6 +106,8 @@ public class RunicNpcs extends JavaPlugin {
         for (Map.Entry<Integer, Npc> npc : npcs.entrySet()) {
             npc.getValue().delete(false);
         }
+
+        EventNpcInteract.stopTask();
     }
 
     @Override
@@ -142,5 +144,4 @@ public class RunicNpcs extends JavaPlugin {
             });
         });
     }
-
 }

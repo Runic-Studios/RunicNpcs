@@ -1,9 +1,7 @@
 package com.runicrealms.plugin.event;
 
-import com.comphenix.protocol.AsynchronousManager;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.async.AsyncListenerHandler;
-import com.comphenix.protocol.async.AsyncRunnable;
 import com.comphenix.protocol.events.ListenerPriority;
 import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
@@ -21,8 +19,9 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
-
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Handles the creation of our custom NpcClickEvent

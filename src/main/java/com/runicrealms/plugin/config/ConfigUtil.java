@@ -3,10 +3,8 @@ package com.runicrealms.plugin.config;
 import com.runicrealms.plugin.Npc;
 import com.runicrealms.plugin.RunicNpcs;
 import com.runicrealms.plugin.Skin;
-import com.runicrealms.plugin.listener.ScoreboardHandler;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
-import me.filoghost.holographicdisplays.api.hologram.line.TextHologramLine;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -44,11 +42,15 @@ public class ConfigUtil {
         if (config.contains("npcs")) {
             ConfigurationSection npcsSection = config.getConfigurationSection("npcs");
             for (String key : npcsSection.getKeys(false)) {
-                Hologram hologram = HolographicDisplaysAPI.get(RunicNpcs.getInstance()).createHologram(new Location(
-                        Bukkit.getWorld(npcsSection.getString(key + ".hologram.world")),
-                        Double.parseDouble(npcsSection.getString(key + ".hologram.x")),
-                        Double.parseDouble(npcsSection.getString(key + ".hologram.y")),
-                        Double.parseDouble(npcsSection.getString(key + ".hologram.z"))));
+                Hologram hologram = HolographicDisplaysAPI.get(RunicNpcs.getInstance()).createHologram(
+                        new Location(
+                                Bukkit.getWorld(npcsSection.getString(key + ".location.world")),
+                                Double.parseDouble(npcsSection.getString(key + ".location.x")),
+                                Double.parseDouble(npcsSection.getString(key + ".location.y")) + 2.5,
+                                Double.parseDouble(npcsSection.getString(key + ".location.z")),
+                                Float.parseFloat(npcsSection.getString(key + ".location.yaw")),
+                                Float.parseFloat(npcsSection.getString(key + ".location.pitch")))
+                );
                 hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', "&e" + npcsSection.getString(key + ".name")));
                 String color = "";
                 String colored = ChatColor.translateAlternateColorCodes('&', npcsSection.getString(key + ".label"));
