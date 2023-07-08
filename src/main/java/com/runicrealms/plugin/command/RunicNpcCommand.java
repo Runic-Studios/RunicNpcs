@@ -7,6 +7,8 @@ import co.aikar.commands.annotation.CommandPermission;
 import co.aikar.commands.annotation.Conditions;
 import co.aikar.commands.annotation.Default;
 import co.aikar.commands.annotation.Subcommand;
+import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.comphenix.protocol.wrappers.Pair;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import com.runicrealms.plugin.MineskinUtil;
@@ -15,16 +17,17 @@ import com.runicrealms.plugin.NpcTag;
 import com.runicrealms.plugin.RunicNpcs;
 import com.runicrealms.plugin.Skin;
 import com.runicrealms.plugin.config.ConfigUtil;
-import com.runicrealms.plugin.listener.ScoreboardHandler;
 import me.filoghost.holographicdisplays.api.hologram.line.TextHologramLine;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
-import java.util.UUID;
 
 @CommandAlias("runicnpc|npc")
 @CommandPermission("runic.op")
@@ -41,6 +44,8 @@ public class RunicNpcCommand extends BaseCommand {
         sendMessage(commandSender, "&2/runicnpc move &a<npc-id> &r- Moves the npc to your current location!");
         sendMessage(commandSender, "&2/runicnpc rename &a<npc-id> <name> &r- Updates the name of the specified npc! Use underscores for spaces.");
         sendMessage(commandSender, "&2/runicnpc skin &a<npc-id> <mineskin-id> &r- Updates the skin of the specified npc!");
+        sendMessage(commandSender, "&2/runicnpc equipment &a<npc-id> <item slot> <material> &r- Updates the equipment of the specified npc!");
+
     }
 
     private static boolean isInt(String number) {
@@ -231,6 +236,59 @@ public class RunicNpcCommand extends BaseCommand {
                     });
                 } else {
                     sendMessage(player, "&cSkin invalid. Did you copy the end of the MineSkin URL?");
+                }
+            });
+        } else {
+            sendHelpMessage(player);
+        }
+    }
+
+    // runicnpc equipment <npc> <slot> <material>
+
+    @Subcommand("equipment")
+    @Conditions("is-op")
+    public void onEquipmentCommand(Player player, String[] args) {
+        if (args.length == 3) {
+            Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
+                EnumWrappers.ItemSlot equipmentSlot;
+
+                try {
+                    equipmentSlot = EnumWrappers.ItemSlot.valueOf(args[1].toUpperCase());
+                } catch(IllegalArgumentException ex) {
+                    sendMessage(player, "&cEquipment Slot Invalid. Valid Slots: MAINHAND, OFFHAND, HEAD, CHEST, LEGS, FEET");
+                    return;
+                }
+
+                switch(equipmentSlot) {
+                    case MAINHAND:
+                    case OFFHAND:
+                    case HEAD:
+                    case CHEST:
+                    case LEGS:
+                    case FEET:
+                        ItemStack itemstack;
+                        if(args[2].equalsIgnoreCase("none")) {
+                            itemstack = null;
+                        } else {
+                            Material material = Material.getMaterial(args[2].toUpperCase());
+                            if (material != null) {
+                                itemstack = new ItemStack(material);
+                            } else {
+                                sendMessage(player, "&cInvalid Material.");
+                                return;
+                            }
+                        }
+                        Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
+                            Npc npc = RunicNpcs.getNpcs().get(Integer.valueOf(args[0]));
+                            npc.getEquipment().put(equipmentSlot, itemstack);
+                            npc.updateEquipment();
+                            ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
+                            sendMessage(player, "&aNPC equipment updated!");
+                        });
+                        break;
+                    default:
+                        sendMessage(player, "&cEquipment Slot Invalid. Valid Slots: MAINHAND, OFFHAND, HEAD, CHEST, LEGS, FEET");
+                        break;
                 }
             });
         } else {

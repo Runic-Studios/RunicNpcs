@@ -1,5 +1,6 @@
 package com.runicrealms.plugin;
 
+import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.runicrealms.plugin.api.RunicNpcsAPI;
 import com.runicrealms.plugin.common.util.grid.GridBounds;
 import com.runicrealms.plugin.common.util.grid.MultiWorldGrid;
@@ -18,11 +19,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class NpcHandler implements Listener, RunicNpcsAPI {
 
@@ -49,7 +49,9 @@ public class NpcHandler implements Listener, RunicNpcsAPI {
             hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', "&e" + name.replaceAll("_", " ")));
             hologram.getLines().appendText(npcTag.getChatColor() + npcTag.getIdentifier());
             Integer id = RunicNpcs.getNextId();
-            Npc npc = new Npc(id, location, npcTag.toString(), name, UUID.randomUUID(), skin, hologram, shown);
+            HashMap<EnumWrappers.ItemSlot, ItemStack> equipmentMap = new HashMap<>();
+            Arrays.stream(EnumWrappers.ItemSlot.values()).forEach(slot -> equipmentMap.put(slot, null));
+            Npc npc = new Npc(id, location, npcTag.toString(), name, UUID.randomUUID(), skin, hologram, equipmentMap, shown);
             ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
             RunicNpcs.getNpcs().put(npc.getId(), npc);
             RunicNpcs.getNpcEntities().put(npc.getEntityId(), npc);

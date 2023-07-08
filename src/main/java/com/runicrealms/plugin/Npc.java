@@ -9,14 +9,12 @@ import me.filoghost.holographicdisplays.api.hologram.VisibilitySettings;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.jetbrains.annotations.ApiStatus;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Npc {
@@ -29,10 +27,11 @@ public class Npc {
     private Skin skin;
     private Location newLocation = null; // Changes when we move an NPC to be saved on restart
     private String label, name;
+    private HashMap<EnumWrappers.ItemSlot, ItemStack> equipment;
 
     private boolean shown;
 
-    public Npc(Integer id, Location location, String label, String name, UUID uuid, Skin skin, Hologram hologram, boolean shown) {
+    public Npc(Integer id, Location location, String label, String name, UUID uuid, Skin skin, Hologram hologram, HashMap<EnumWrappers.ItemSlot, ItemStack> equipment, boolean shown) {
         this.id = id;
         this.location = location;
         this.label = label;
@@ -41,6 +40,7 @@ public class Npc {
         this.skin = skin;
         this.hologram = hologram;
         this.shown = shown;
+        this.equipment = equipment;
 
         this.gameProfile = new WrappedGameProfile(uuid, "npc_" + id);
         this.gameProfile.getProperties().put("textures", new WrappedSignedProperty("textures", this.skin.getTexture(), this.skin.getSignature()));
@@ -118,6 +118,10 @@ public class Npc {
 
     public boolean hasNewLocation() {
         return this.newLocation != null;
+    }
+
+    public HashMap<EnumWrappers.ItemSlot, ItemStack> getEquipment() {
+        return equipment;
     }
 
     public boolean isShown() {
@@ -233,7 +237,25 @@ public class Npc {
         metadataPacket.getDataValueCollectionModifier().write(0, dataValues);
         ProtocolLibrary.getProtocolManager().sendServerPacket(player, metadataPacket);
 
+        updateEquipment();
+
         rotateHeadForPlayer(player, this.location);
+    }
+
+    public void updateEquipment() {
+        List<Pair<EnumWrappers.ItemSlot, ItemStack>> npcequipment = getEquipmentPacket();
+        if(npcequipment.size() > 0) {
+            PacketContainer equipmentContainer = new PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT);
+            equipmentContainer.getIntegers().write(0, getEntityId());
+            equipmentContainer.getLists(BukkitConverters.getPairConverter(EnumWrappers.getItemSlotConverter(), BukkitConverters.getItemStackConverter())).write(0, npcequipment);
+            ProtocolLibrary.getProtocolManager().broadcastServerPacket(equipmentContainer);
+        }
+    }
+
+    private List<Pair<EnumWrappers.ItemSlot, ItemStack>> getEquipmentPacket() {
+        List<Pair<EnumWrappers.ItemSlot, ItemStack>> equipmentList = new ArrayList();
+        getEquipment().forEach((slot, item) ->  equipmentList.add(new Pair<>(slot, item)));
+        return equipmentList;
     }
 
 }

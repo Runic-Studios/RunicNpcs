@@ -1,5 +1,6 @@
 package com.runicrealms.plugin.config;
 
+import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.runicrealms.plugin.Npc;
 import com.runicrealms.plugin.RunicNpcs;
 import com.runicrealms.plugin.Skin;
@@ -8,9 +9,12 @@ import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 
 import java.io.File;
 import java.io.IOException;
@@ -66,6 +70,11 @@ public class ConfigUtil {
                     }
                 }
                 hologram.getLines().appendText(ChatColor.translateAlternateColorCodes('&', color + npcsSection.getString(key + ".label")));
+
+                ConfigurationSection equipmentSection = npcsSection.getConfigurationSection(key + ".equipment");
+                HashMap<EnumWrappers.ItemSlot, ItemStack> equipment = loadEquipment(equipmentSection);
+
+
                 Npc npc = new Npc(
                         Integer.parseInt(key),
                         location,
@@ -74,6 +83,7 @@ public class ConfigUtil {
                         UUID.randomUUID(),
                         new Skin(npcsSection.getString(key + ".skin-texture"), npcsSection.getString(key + ".skin-signature")),
                         hologram,
+                        equipment,
                         !npcsSection.contains(key + ".shown") || npcsSection.getBoolean(key + ".shown"));
                 npcs.put(Integer.parseInt(key), npc);
             }
@@ -118,6 +128,17 @@ public class ConfigUtil {
             config.set("npcs." + npc.getId() + ".location.pitch", location.getPitch());
             config.set("npcs." + npc.getId() + ".skin-texture", npc.getSkin().getTexture());
             config.set("npcs." + npc.getId() + ".skin-signature", npc.getSkin().getSignature());
+
+            for(EnumWrappers.ItemSlot slot : npc.getEquipment().keySet()) {
+                ItemStack itemStack = npc.getEquipment().get(slot);
+                if(itemStack == null) {
+                    config.set("npcs." + npc.getId() + ".equipment." + slot.name().toLowerCase(), "NONE");
+                } else {
+                    config.set("npcs." + npc.getId() + ".equipment." + slot.name().toLowerCase(), itemStack.getType().toString().toUpperCase());
+                }
+
+            }
+
             config.set("npcs." + npc.getId() + ".shown", npc.isShown());
             Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
                 try {
@@ -152,6 +173,25 @@ public class ConfigUtil {
             }
             return 0;
         }
+    }
+
+    private static HashMap<EnumWrappers.ItemSlot, ItemStack> loadEquipment(ConfigurationSection config) {
+        HashMap<EnumWrappers.ItemSlot, ItemStack> equipmentMap = new HashMap<>();
+
+        for(String configSlot : config.getKeys(false)) {
+            EnumWrappers.ItemSlot slot = EnumWrappers.ItemSlot.valueOf(configSlot.toUpperCase());
+            String matString = config.getString(configSlot);
+            if(matString.equalsIgnoreCase("none")) continue;
+            Material material = Material.getMaterial(matString.toUpperCase());
+            if(material == null) {
+                Bukkit.getLogger().log(Level.WARNING, "Error loading equipment for NPC ID: " + config.getParent());
+                equipmentMap.put(slot, null);
+                continue;
+            }
+            equipmentMap.put(slot, new ItemStack(material));
+        }
+
+        return equipmentMap;
     }
 
 }
