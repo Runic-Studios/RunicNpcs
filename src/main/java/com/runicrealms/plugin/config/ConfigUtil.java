@@ -13,8 +13,9 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
 import java.io.IOException;
@@ -132,9 +133,13 @@ public class ConfigUtil {
             for(EnumWrappers.ItemSlot slot : npc.getEquipment().keySet()) {
                 ItemStack itemStack = npc.getEquipment().get(slot);
                 if(itemStack == null) {
-                    config.set("npcs." + npc.getId() + ".equipment." + slot.name().toLowerCase(), "NONE");
+                    config.set("npcs." + npc.getId() + ".equipment." + slot.name().toLowerCase() + ".material", "NONE");
+                    config.set("npcs." + npc.getId() + ".equipment." + slot.name().toLowerCase() + ".durability", 0);
                 } else {
-                    config.set("npcs." + npc.getId() + ".equipment." + slot.name().toLowerCase(), itemStack.getType().toString().toUpperCase());
+                    config.set("npcs." + npc.getId() + ".equipment." + slot.name().toLowerCase() + ".material", itemStack.getType().toString().toUpperCase());
+                    if(itemStack.getItemMeta() instanceof Damageable) {
+                        config.set("npcs." + npc.getId() + ".equipment." + slot.name().toLowerCase() + ".durability", ((Damageable) itemStack.getItemMeta()).getDamage());
+                    }
                 }
 
             }
@@ -180,7 +185,7 @@ public class ConfigUtil {
 
         for(String configSlot : config.getKeys(false)) {
             EnumWrappers.ItemSlot slot = EnumWrappers.ItemSlot.valueOf(configSlot.toUpperCase());
-            String matString = config.getString(configSlot);
+            String matString = config.getString(configSlot + ".material");
             if(matString.equalsIgnoreCase("none")) continue;
             Material material = Material.getMaterial(matString.toUpperCase());
             if(material == null) {
@@ -188,7 +193,11 @@ public class ConfigUtil {
                 equipmentMap.put(slot, null);
                 continue;
             }
-            equipmentMap.put(slot, new ItemStack(material));
+            ItemStack stack = new ItemStack(material);
+            ItemMeta meta = stack.getItemMeta();
+            ((Damageable) meta).setDamage(config.getInt(configSlot + ".damage"));
+            stack.setItemMeta(meta);
+            equipmentMap.put(slot, stack);
         }
 
         return equipmentMap;

@@ -1,22 +1,13 @@
 package com.runicrealms.plugin.command;
 
 import co.aikar.commands.BaseCommand;
-import co.aikar.commands.annotation.CatchUnknown;
-import co.aikar.commands.annotation.CommandAlias;
-import co.aikar.commands.annotation.CommandPermission;
-import co.aikar.commands.annotation.Conditions;
-import co.aikar.commands.annotation.Default;
-import co.aikar.commands.annotation.Subcommand;
+import co.aikar.commands.annotation.*;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.comphenix.protocol.wrappers.Pair;
+import com.runicrealms.plugin.*;
+import com.runicrealms.plugin.config.ConfigUtil;
+import com.runicrealms.plugin.util.ItemUtil;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
-import com.runicrealms.plugin.MineskinUtil;
-import com.runicrealms.plugin.Npc;
-import com.runicrealms.plugin.NpcTag;
-import com.runicrealms.plugin.RunicNpcs;
-import com.runicrealms.plugin.Skin;
-import com.runicrealms.plugin.config.ConfigUtil;
 import me.filoghost.holographicdisplays.api.hologram.line.TextHologramLine;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -24,8 +15,9 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Map;
 
@@ -44,7 +36,7 @@ public class RunicNpcCommand extends BaseCommand {
         sendMessage(commandSender, "&2/runicnpc move &a<npc-id> &r- Moves the npc to your current location!");
         sendMessage(commandSender, "&2/runicnpc rename &a<npc-id> <name> &r- Updates the name of the specified npc! Use underscores for spaces.");
         sendMessage(commandSender, "&2/runicnpc skin &a<npc-id> <mineskin-id> &r- Updates the skin of the specified npc!");
-        sendMessage(commandSender, "&2/runicnpc equipment &a<npc-id> <item slot> <material> &r- Updates the equipment of the specified npc!");
+        sendMessage(commandSender, "&2/runicnpc equipment &a<npc-id> <item slot> <material> <durability> &r- Updates the equipment of the specified npc!");
 
     }
 
@@ -199,21 +191,21 @@ public class RunicNpcCommand extends BaseCommand {
     @Conditions("is-op")
     public void onRenameCommand(Player player, String[] args) {
         if (args.length == 2) {
-                if (args[1] != null) {
-                    String name = args[1].replaceAll("_", " ");
-                    Npc npc = RunicNpcs.getNpcs().get(Integer.valueOf(args[0]));
-                    Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
-                        npc.setName(name);
-                        ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
-                        sendMessage(player, "&aNPC name updated!");
-                    });
+            if (args[1] != null) {
+                String name = args[1].replaceAll("_", " ");
+                Npc npc = RunicNpcs.getNpcs().get(Integer.valueOf(args[0]));
+                Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
+                    npc.setName(name);
+                    ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
+                    sendMessage(player, "&aNPC name updated!");
+                });
 
-                    npc.getHologram().getLines().remove(0);
-                    npc.getHologram().getLines().insertText(0, name);
+                npc.getHologram().getLines().remove(0);
+                npc.getHologram().getLines().insertText(0, name);
 
-                } else {
-                    sendMessage(player, "&cCommand returned invalid.");
-                }
+            } else {
+                sendMessage(player, "&cCommand returned invalid.");
+            }
         } else {
             sendHelpMessage(player);
         }
@@ -243,53 +235,65 @@ public class RunicNpcCommand extends BaseCommand {
         }
     }
 
-    // runicnpc equipment <npc> <slot> <material>
+    // runicnpc equipment <npc> <slot> <material> <durability>
 
     @Subcommand("equipment")
     @Conditions("is-op")
     public void onEquipmentCommand(Player player, String[] args) {
-        if (args.length == 3) {
+        if (args.length == 3 || args.length == 4) {
             Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
                 EnumWrappers.ItemSlot equipmentSlot;
 
                 try {
                     equipmentSlot = EnumWrappers.ItemSlot.valueOf(args[1].toUpperCase());
-                } catch(IllegalArgumentException ex) {
+                } catch (IllegalArgumentException ex) {
                     sendMessage(player, "&cEquipment Slot Invalid. Valid Slots: MAINHAND, OFFHAND, HEAD, CHEST, LEGS, FEET");
                     return;
                 }
 
-                switch(equipmentSlot) {
-                    case MAINHAND:
-                    case OFFHAND:
-                    case HEAD:
-                    case CHEST:
-                    case LEGS:
-                    case FEET:
-                        ItemStack itemstack;
-                        if(args[2].equalsIgnoreCase("none")) {
-                            itemstack = null;
-                        } else {
-                            Material material = Material.getMaterial(args[2].toUpperCase());
-                            if (material != null) {
-                                itemstack = new ItemStack(material);
-                            } else {
-                                sendMessage(player, "&cInvalid Material.");
-                                return;
+                ItemStack itemstack;
+                if (args[2].equalsIgnoreCase("none")) {
+                    itemstack = null;
+                } else {
+                    Material material = Material.getMaterial(args[2].toUpperCase());
+                    if (material != null) {
+                        itemstack = new ItemStack(material);
+                        ItemMeta meta = itemstack.getItemMeta();
+
+                        if (meta instanceof Damageable) {
+                            Damageable damageable = (Damageable) meta;
+                            int damage = 0;
+                            if(args.length == 4) {
+                                try {
+                                    damage = Integer.parseInt(args[3]);
+                                } catch (NumberFormatException ex) {
+                                    sendMessage(player, "&cInvalid Damage Amount");
+                                    return;
+                                }
                             }
+                            damageable.setDamage(damage);
                         }
-                        Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
-                            Npc npc = RunicNpcs.getNpcs().get(Integer.valueOf(args[0]));
-                            npc.getEquipment().put(equipmentSlot, itemstack);
-                            npc.updateEquipment();
-                            ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
-                            sendMessage(player, "&aNPC equipment updated!");
-                        });
-                        break;
-                    default:
-                        sendMessage(player, "&cEquipment Slot Invalid. Valid Slots: MAINHAND, OFFHAND, HEAD, CHEST, LEGS, FEET");
-                        break;
+
+                        itemstack.setItemMeta(meta);
+
+                        if(!ItemUtil.isEquippable(equipmentSlot, itemstack)) {
+                            sendMessage(player, "&cYou cannot equip this item in this slot");
+                            return;
+                        }
+
+                    } else {
+                        sendMessage(player, "&cInvalid Material.");
+                        return;
+                    }
                 }
+
+                Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
+                    Npc npc = RunicNpcs.getNpcs().get(Integer.valueOf(args[0]));
+                    npc.getEquipment().put(equipmentSlot, itemstack);
+                    npc.updateEquipment();
+                    ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
+                    sendMessage(player, "&aNPC equipment updated!");
+                });
             });
         } else {
             sendHelpMessage(player);
@@ -302,25 +306,25 @@ public class RunicNpcCommand extends BaseCommand {
     @Conditions("is-op")
     public void onTagCommand(Player player, String[] args) {
         if (args.length == 2) {
-                if (args[1] != null) {
-                    NpcTag npcTag = NpcTag.getFromIdentifier(args[1]);
-                    if (npcTag == null) {
-                        sendMessage(player, "&cPlease enter a valid tag");
-                        return;
-                    }
-                    Npc npc = RunicNpcs.getNpcs().get(Integer.valueOf(args[0]));
-                    Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
-                        npc.setLabel(npcTag.getChatColor() + npcTag.getIdentifier());
-                        ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
-                        sendMessage(player, "&aNPC tag updated!");
-                    });
-                    // Update the Hologram
-                    npc.getHologram().getLines().remove(1);
-                    npc.getHologram().getLines().insertText(1, npcTag.getChatColor() + npcTag.getIdentifier());
-
-                } else {
-                    sendMessage(player, "&cCommand returned invalid.");
+            if (args[1] != null) {
+                NpcTag npcTag = NpcTag.getFromIdentifier(args[1]);
+                if (npcTag == null) {
+                    sendMessage(player, "&cPlease enter a valid tag");
+                    return;
                 }
+                Npc npc = RunicNpcs.getNpcs().get(Integer.valueOf(args[0]));
+                Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
+                    npc.setLabel(npcTag.getChatColor() + npcTag.getIdentifier());
+                    ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
+                    sendMessage(player, "&aNPC tag updated!");
+                });
+                // Update the Hologram
+                npc.getHologram().getLines().remove(1);
+                npc.getHologram().getLines().insertText(1, npcTag.getChatColor() + npcTag.getIdentifier());
+
+            } else {
+                sendMessage(player, "&cCommand returned invalid.");
+            }
         } else {
             sendHelpMessage(player);
         }
