@@ -86,7 +86,7 @@ public class RunicNpcCommand extends BaseCommand {
         Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
             Skin skin = MineskinUtil.getMineskinSkin(args[2]);
             if (skin != null) {
-                String name = args[0];
+                String name = args[0].replace("_", " ");
                 Location npcLocation = new Location(player.getWorld(), player.getLocation().getBlockX() + 0.5, player.getLocation().getY(), player.getLocation().getBlockZ() + 0.5, player.getLocation().getYaw(), player.getLocation().getPitch());
                 Hologram hologram = HolographicDisplaysAPI.get(RunicNpcs.getInstance()).createHologram(new Location(npcLocation.getWorld(), npcLocation.getX(), npcLocation.getY() + RunicNpcs.HOLOGRAM_VERTICAL_OFFSET, npcLocation.getZ()));
 
