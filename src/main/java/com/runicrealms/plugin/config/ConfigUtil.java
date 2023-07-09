@@ -122,14 +122,13 @@ public class ConfigUtil {
             Location location = npc.hasNewLocation() ? npc.getNewLocation() : npc.getLocation();
             config.set("npcs." + npc.getId() + ".name", npc.getName());
             config.set("npcs." + npc.getId() + ".label", npc.getLabel().getIdentifier());
+            config.set("npcs." + npc.getId() + ".shown", npc.isShown());
             config.set("npcs." + npc.getId() + ".location.world", location.getWorld().getName());
             config.set("npcs." + npc.getId() + ".location.x", location.getX());
             config.set("npcs." + npc.getId() + ".location.y", location.getY());
             config.set("npcs." + npc.getId() + ".location.z", location.getZ());
             config.set("npcs." + npc.getId() + ".location.yaw", location.getYaw());
             config.set("npcs." + npc.getId() + ".location.pitch", location.getPitch());
-            config.set("npcs." + npc.getId() + ".skin-texture", npc.getSkin().getTexture());
-            config.set("npcs." + npc.getId() + ".skin-signature", npc.getSkin().getSignature());
 
             for(EnumWrappers.ItemSlot slot : npc.getEquipment().keySet()) {
                 ItemStack itemStack = npc.getEquipment().get(slot);
@@ -142,10 +141,11 @@ public class ConfigUtil {
                         config.set("npcs." + npc.getId() + ".equipment." + slot.name().toLowerCase() + ".durability", ((Damageable) itemStack.getItemMeta()).getDamage());
                     }
                 }
-
             }
 
-            config.set("npcs." + npc.getId() + ".shown", npc.isShown());
+            config.set("npcs." + npc.getId() + ".skin-texture", npc.getSkin().getTexture());
+            config.set("npcs." + npc.getId() + ".skin-signature", npc.getSkin().getSignature());
+
             Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
                 try {
                     config.save(new File(RunicNpcs.getInstance().getDataFolder(), "npcs.yml"));
