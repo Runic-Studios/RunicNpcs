@@ -314,7 +314,7 @@ public class RunicNpcCommand extends BaseCommand {
                 }
                 Npc npc = RunicNpcs.getNpcs().get(Integer.valueOf(args[0]));
                 Bukkit.getScheduler().runTaskAsynchronously(RunicNpcs.getInstance(), () -> {
-                    npc.setLabel(npcTag.getChatColor() + npcTag.getIdentifier());
+                    npc.setLabel(npcTag);
                     ConfigUtil.saveNpc(npc, RunicNpcs.getFileConfig());
                     sendMessage(player, "&aNPC tag updated!");
                 });

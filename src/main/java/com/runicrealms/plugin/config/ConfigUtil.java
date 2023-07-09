@@ -2,6 +2,7 @@ package com.runicrealms.plugin.config;
 
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import com.runicrealms.plugin.Npc;
+import com.runicrealms.plugin.NpcTag;
 import com.runicrealms.plugin.RunicNpcs;
 import com.runicrealms.plugin.Skin;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
@@ -79,7 +80,7 @@ public class ConfigUtil {
                 Npc npc = new Npc(
                         Integer.parseInt(key),
                         location,
-                        npcsSection.getString(key + ".label"),
+                        NpcTag.getFromIdentifier(npcsSection.getString(key + ".label")),
                         npcsSection.getString(key + ".name"),
                         UUID.randomUUID(),
                         new Skin(npcsSection.getString(key + ".skin-texture"), npcsSection.getString(key + ".skin-signature")),
@@ -120,7 +121,7 @@ public class ConfigUtil {
         Bukkit.getScheduler().runTask(RunicNpcs.getInstance(), () -> {
             Location location = npc.hasNewLocation() ? npc.getNewLocation() : npc.getLocation();
             config.set("npcs." + npc.getId() + ".name", npc.getName());
-            config.set("npcs." + npc.getId() + ".label", npc.getLabel());
+            config.set("npcs." + npc.getId() + ".label", npc.getLabel().getIdentifier());
             config.set("npcs." + npc.getId() + ".location.world", location.getWorld().getName());
             config.set("npcs." + npc.getId() + ".location.x", location.getX());
             config.set("npcs." + npc.getId() + ".location.y", location.getY());

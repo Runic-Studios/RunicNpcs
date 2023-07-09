@@ -9,10 +9,8 @@ import me.filoghost.holographicdisplays.api.hologram.VisibilitySettings;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.*;
 
@@ -26,12 +24,13 @@ public class Npc {
     private final UUID uuid;
     private Skin skin;
     private Location newLocation = null; // Changes when we move an NPC to be saved on restart
-    private String label, name;
+    private String name;
+    private NpcTag label;
     private HashMap<EnumWrappers.ItemSlot, ItemStack> equipment;
 
     private boolean shown;
 
-    public Npc(Integer id, Location location, String label, String name, UUID uuid, Skin skin, Hologram hologram, HashMap<EnumWrappers.ItemSlot, ItemStack> equipment, boolean shown) {
+    public Npc(Integer id, Location location, NpcTag label, String name, UUID uuid, Skin skin, Hologram hologram, HashMap<EnumWrappers.ItemSlot, ItemStack> equipment, boolean shown) {
         this.id = id;
         this.location = location;
         this.label = label;
@@ -76,11 +75,11 @@ public class Npc {
     /**
      * @return the label of the Npc "Merchant," "Quest," etc.
      */
-    public String getLabel() {
+    public NpcTag getLabel() {
         return this.label;
     }
 
-    public void setLabel(String label) {
+    public void setLabel(NpcTag label) {
         this.label = label;
     }
 
