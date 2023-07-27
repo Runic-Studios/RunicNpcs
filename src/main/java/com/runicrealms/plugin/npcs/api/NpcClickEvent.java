@@ -1,6 +1,6 @@
-package com.runicrealms.plugin.api;
+package com.runicrealms.plugin.npcs.api;
 
-import com.runicrealms.plugin.Npc;
+import com.runicrealms.plugin.npcs.Npc;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;

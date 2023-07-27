@@ -1,11 +1,15 @@
-package com.runicrealms.plugin.command;
+package com.runicrealms.plugin.npcs.command;
 
 import co.aikar.commands.BaseCommand;
 import co.aikar.commands.annotation.*;
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.runicrealms.plugin.*;
-import com.runicrealms.plugin.config.ConfigUtil;
-import com.runicrealms.plugin.util.ItemUtil;
+import com.runicrealms.plugin.npcs.MineskinUtil;
+import com.runicrealms.plugin.npcs.Npc;
+import com.runicrealms.plugin.npcs.NpcTag;
+import com.runicrealms.plugin.npcs.RunicNpcs;
+import com.runicrealms.plugin.npcs.Skin;
+import com.runicrealms.plugin.npcs.util.ItemUtil;
+import com.runicrealms.plugin.npcs.config.ConfigUtil;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import me.filoghost.holographicdisplays.api.hologram.line.TextHologramLine;

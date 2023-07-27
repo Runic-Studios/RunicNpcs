@@ -1,4 +1,4 @@
-package com.runicrealms.plugin;
+package com.runicrealms.plugin.npcs;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;

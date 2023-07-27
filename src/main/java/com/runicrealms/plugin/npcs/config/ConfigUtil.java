@@ -1,10 +1,10 @@
-package com.runicrealms.plugin.config;
+package com.runicrealms.plugin.npcs.config;
 
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.runicrealms.plugin.Npc;
-import com.runicrealms.plugin.NpcTag;
-import com.runicrealms.plugin.RunicNpcs;
-import com.runicrealms.plugin.Skin;
+import com.runicrealms.plugin.npcs.NpcTag;
+import com.runicrealms.plugin.npcs.RunicNpcs;
+import com.runicrealms.plugin.npcs.Skin;
+import com.runicrealms.plugin.npcs.Npc;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import org.bukkit.Bukkit;

@@ -1,4 +1,4 @@
-package com.runicrealms.plugin.util;
+package com.runicrealms.plugin.npcs.util;
 
 import com.comphenix.protocol.wrappers.EnumWrappers;
 import org.bukkit.inventory.EquipmentSlot;

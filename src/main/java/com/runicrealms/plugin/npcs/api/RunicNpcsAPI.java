@@ -1,8 +1,8 @@
-package com.runicrealms.plugin.api;
+package com.runicrealms.plugin.npcs.api;
 
-import com.runicrealms.plugin.Npc;
-import com.runicrealms.plugin.NpcTag;
-import com.runicrealms.plugin.Skin;
+import com.runicrealms.plugin.npcs.Npc;
+import com.runicrealms.plugin.npcs.NpcTag;
+import com.runicrealms.plugin.npcs.Skin;
 import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;

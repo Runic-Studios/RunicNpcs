@@ -1,7 +1,7 @@
 name: RunicNpcs
 description: Runic Realms NPCs RunicNpcs, by Excel
 version: 1.0
-main: com.runicrealms.plugin.RunicNpcs
+main: com.runicrealms.plugin.npcs.RunicNpcs
 api-version: 1.13
 depend:
   - HolographicDisplays

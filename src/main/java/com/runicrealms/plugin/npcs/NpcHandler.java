@@ -1,11 +1,11 @@
-package com.runicrealms.plugin;
+package com.runicrealms.plugin.npcs;
 
 import com.comphenix.protocol.wrappers.EnumWrappers;
-import com.runicrealms.plugin.api.RunicNpcsAPI;
+import com.runicrealms.plugin.npcs.api.RunicNpcsAPI;
+import com.runicrealms.plugin.npcs.listener.ScoreboardHandler;
 import com.runicrealms.plugin.common.util.grid.GridBounds;
 import com.runicrealms.plugin.common.util.grid.MultiWorldGrid;
-import com.runicrealms.plugin.config.ConfigUtil;
-import com.runicrealms.plugin.listener.ScoreboardHandler;
+import com.runicrealms.plugin.npcs.config.ConfigUtil;
 import me.filoghost.holographicdisplays.api.HolographicDisplaysAPI;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import org.bukkit.Bukkit;
