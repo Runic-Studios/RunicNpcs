@@ -3,7 +3,14 @@ package com.runicrealms.plugin.npcs;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.PacketContainer;
-import com.comphenix.protocol.wrappers.*;
+import com.comphenix.protocol.wrappers.BukkitConverters;
+import com.comphenix.protocol.wrappers.EnumWrappers;
+import com.comphenix.protocol.wrappers.Pair;
+import com.comphenix.protocol.wrappers.PlayerInfoData;
+import com.comphenix.protocol.wrappers.WrappedDataValue;
+import com.comphenix.protocol.wrappers.WrappedDataWatcher;
+import com.comphenix.protocol.wrappers.WrappedGameProfile;
+import com.comphenix.protocol.wrappers.WrappedSignedProperty;
 import me.filoghost.holographicdisplays.api.hologram.Hologram;
 import me.filoghost.holographicdisplays.api.hologram.VisibilitySettings;
 import org.bukkit.Bukkit;
@@ -12,7 +19,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class Npc {
@@ -60,9 +72,12 @@ public class Npc {
     }
 
     public Integer getEntityId() {
-        return 9000 + this.getId();
+        return Integer.MAX_VALUE - this.getId(); // Make sure to select an entity ID that won't be used by the server
     }
-    public String getEntityName() { return this.gameProfile.getName();}
+
+    public String getEntityName() {
+        return this.gameProfile.getName();
+    }
 
     public Hologram getHologram() {
         return this.hologram;
@@ -138,40 +153,40 @@ public class Npc {
     @Deprecated
     public void moveEntityForPlayer(Player player, double x, double y, double z) {
         this.hologram.getVisibilitySettings().setIndividualVisibility(player, VisibilitySettings.Visibility.HIDDEN);
-            new BukkitRunnable() {
-                double curX = Npc.this.getLocation().getX();
-                double curY = Npc.this.getLocation().getY();
-                double curZ = Npc.this.getLocation().getZ();
+        new BukkitRunnable() {
+            double curX = Npc.this.getLocation().getX();
+            double curY = Npc.this.getLocation().getY();
+            double curZ = Npc.this.getLocation().getZ();
 
-                @Override
-                public void run() {
-                    if ((Math.abs(curX - x) < 0.1) && (Math.abs(curY - y) < 0.1) && (Math.abs(curZ - z) < 0.1)) {
-                       // Npc.this.hologram.setPosition(new Location(Bukkit.getWorld("Alterra"), x,y + 2.5,z));
-                       // Npc.this.hologram.getVisibilitySettings().setIndividualVisibility(player, VisibilitySettings.Visibility.VISIBLE);
-                        this.cancel();
-                        return;
-                    }
-
-                    if (curX < x) curX += 0.1;
-                    if (curY < y) curY += 0.1;
-                    if (curZ < z) curZ += 0.1;
-
-                    if (curX > x) curX -= 0.1;
-                    if (curY > y) curY -= 0.1;
-                    if (curZ > z) curZ -= 0.1;
-
-                    PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_TELEPORT);
-                    packet.getIntegers().write(0, Npc.this.getEntityId());
-                    packet.getDoubles().write(0, curX);
-                    packet.getDoubles().write(1, curY);
-                    packet.getDoubles().write(2, curZ);
-                    packet.getBytes().write(0, (byte) ((int) Npc.this.getLocation().getYaw() * 256.0F / 360.0F));
-                    packet.getBytes().write(1, (byte) ((int) Npc.this.getLocation().getPitch() * 256.0F / 360.0F));
-                    packet.getBooleans().write(0, false);
-                    ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
-                    lookAtForPlayer(player, x, y, z);
+            @Override
+            public void run() {
+                if ((Math.abs(curX - x) < 0.1) && (Math.abs(curY - y) < 0.1) && (Math.abs(curZ - z) < 0.1)) {
+                    // Npc.this.hologram.setPosition(new Location(Bukkit.getWorld("Alterra"), x,y + 2.5,z));
+                    // Npc.this.hologram.getVisibilitySettings().setIndividualVisibility(player, VisibilitySettings.Visibility.VISIBLE);
+                    this.cancel();
+                    return;
                 }
-            }.runTaskTimer(RunicNpcs.getInstance(), 0L, 1L);
+
+                if (curX < x) curX += 0.1;
+                if (curY < y) curY += 0.1;
+                if (curZ < z) curZ += 0.1;
+
+                if (curX > x) curX -= 0.1;
+                if (curY > y) curY -= 0.1;
+                if (curZ > z) curZ -= 0.1;
+
+                PacketContainer packet = new PacketContainer(PacketType.Play.Server.ENTITY_TELEPORT);
+                packet.getIntegers().write(0, Npc.this.getEntityId());
+                packet.getDoubles().write(0, curX);
+                packet.getDoubles().write(1, curY);
+                packet.getDoubles().write(2, curZ);
+                packet.getBytes().write(0, (byte) ((int) Npc.this.getLocation().getYaw() * 256.0F / 360.0F));
+                packet.getBytes().write(1, (byte) ((int) Npc.this.getLocation().getPitch() * 256.0F / 360.0F));
+                packet.getBooleans().write(0, false);
+                ProtocolLibrary.getProtocolManager().sendServerPacket(player, packet);
+                lookAtForPlayer(player, x, y, z);
+            }
+        }.runTaskTimer(RunicNpcs.getInstance(), 0L, 1L);
 
     }
 
@@ -243,7 +258,7 @@ public class Npc {
 
     public void updateEquipment() {
         List<Pair<EnumWrappers.ItemSlot, ItemStack>> npcequipment = getEquipmentPacket();
-        if(npcequipment.size() > 0) {
+        if (npcequipment.size() > 0) {
             PacketContainer equipmentContainer = new PacketContainer(PacketType.Play.Server.ENTITY_EQUIPMENT);
             equipmentContainer.getIntegers().write(0, getEntityId());
             equipmentContainer.getLists(BukkitConverters.getPairConverter(EnumWrappers.getItemSlotConverter(), BukkitConverters.getItemStackConverter())).write(0, npcequipment);
@@ -253,7 +268,7 @@ public class Npc {
 
     private List<Pair<EnumWrappers.ItemSlot, ItemStack>> getEquipmentPacket() {
         List<Pair<EnumWrappers.ItemSlot, ItemStack>> equipmentList = new ArrayList();
-        getEquipment().forEach((slot, item) ->  equipmentList.add(new Pair<>(slot, item)));
+        getEquipment().forEach((slot, item) -> equipmentList.add(new Pair<>(slot, item)));
         return equipmentList;
     }
 
